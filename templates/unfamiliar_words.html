@@ -1,0 +1,28 @@
+<!DOCTYPE html>
+{% extends 'base.html' %}
+
+{% block content %}
+ <div class="container">
+  <h1>List of Unfamiliar Words</h1>
+  <table class="table table-striped my-table">
+    <thead>
+      <tr>
+        <th>Word</th>
+        <th>Translation</th>
+        <th>Book</th>
+        <th>Difficulty</th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for word in word_list %}
+        <tr>
+          <td>{{ word[0] }}</td>
+          <td>{{ word[1] }}</td>
+          <td>{{ word[2] }}</td>
+          <td>{{ word[3] }}</td>
+        </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+   </div>
+{% endblock %}

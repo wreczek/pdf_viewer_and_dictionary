@@ -1,0 +1,14 @@
+{% extends 'base.html' %}
+
+{% block title %}
+    Main page
+{% endblock %}
+
+{% block content %}
+    <h1>List of Uploaded PDFs</h1>
+    <ul>
+        {% for pdf_file in pdf_files %}
+            <li><a href="/file/{{ pdf_file }}">{{ pdf_file }}</a></li>
+        {% endfor %}
+    </ul>
+{% endblock %}
