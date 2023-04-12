@@ -3,6 +3,8 @@
 <head>
   <title>{% block title %}{% endblock %}</title>
   <link rel="stylesheet" href="{{ url_for('static', filename='css/bootstrap.min.css') }}">
+    <script src="{{ url_for('static', filename='js/jquery.min.js') }}"></script>
+<script src="{{ url_for('static', filename='js/bootstrap.min.js') }}"></script>
   <style>
     .nav-bar {
       display: flex;
@@ -41,16 +43,22 @@
   background-color: #f2f2f2;
 }
   </style>
+
 </head>
 <body>
-  <div class="nav-bar">
-    <div>
-      <a href="{{ url_for('index') }}">Home</a>
-    </div>
-    <div>
-      <a href="{{ url_for('unfamiliar_words') }}">Unfamiliar Words</a>
-    </div>
+ <div class="nav-bar">
+  <div>
+    <a href="{{ url_for('index') }}">Files</a>
   </div>
+  {% if current_file %}
+    <div>
+      <a href="#" class="active">{{ current_file }}</a>
+    </div>
+  {% endif %}
+  <div>
+    <a href="{{ url_for('unfamiliar_words') }}">Dictionary</a>
+  </div>
+</div>
   {% block content %}{% endblock %}
 </body>
 </html>

@@ -27,3 +27,10 @@ def unfamiliar_words():
     # Render the unfamiliar_words.html template with the list of unfamiliar words
     return render_template('unfamiliar_words.html', word_list=word_list)
 
+
+@app.route('/pdf/<filename>')
+def pdf_viewer(filename):
+    # Set the current file variable to the filename
+    current_file = filename
+    # Render the PDF viewer template with the current file variable
+    return render_template('pdf_viewer.html', current_file=current_file)
