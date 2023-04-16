@@ -1,10 +1,12 @@
-<!DOCTYPE html>
 {% extends 'base.html' %}
 
 {% block title %}
-    File {{ current_file }}
+    File {{ file_name }}
 {% endblock %}
 
 {% block content %}
+  <div class="container">
+    <h1>{{ file_name }}</h1>
+    <iframe src="{{ url_for('pdf', path=file_name) }}" width="100%" height="800px"></iframe>
+  </div>
 {% endblock %}
-
