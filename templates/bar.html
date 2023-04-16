@@ -3,62 +3,59 @@
 <head>
   <title>{% block title %}{% endblock %}</title>
   <link rel="stylesheet" href="{{ url_for('static', filename='css/bootstrap.min.css') }}">
-    <script src="{{ url_for('static', filename='js/jquery.min.js') }}"></script>
-<script src="{{ url_for('static', filename='js/bootstrap.min.js') }}"></script>
+  <script src="{{ url_for('static', filename='js/jquery.min.js') }}"></script>
+  <script src="{{ url_for('static', filename='js/bootstrap.min.js') }}"></script>
   <style>
     .nav-bar {
       display: flex;
       justify-content: space-between;
       align-items: center;
       background-color: #f8f9fa;
-      padding: 10px;
+      padding: 20px;
     }
     .nav-bar a {
       text-decoration: none;
       color: black;
-      font-size: 18px;
-      margin-right: 10px;
+      font-size: 21px;
+      margin-right: 40px;
+      margin-left: 40px;
+      display: inline-block; /* Add this line to make the buttons closer to each other */
+      padding: 20px; /* Add this line to make the buttons clickable */
     }
     .nav-bar a:hover {
       text-decoration: underline;
     }
 
     .my-table {
-  border-collapse: collapse;
-  width: 100%;
-}
+      border-collapse: collapse;
+      width: 100%;
+    }
 
-.my-table th,
-.my-table td {
-  text-align: left;
-  padding: 8px;
-}
+    .my-table th,
+    .my-table td {
+      text-align: left;
+      padding: 8px;
+    }
 
-.my-table th {
-  background-color: #007bff;
-  color: white;
-}
+    .my-table th {
+      background-color: #007bff;
+      color: white;
+    }
 
-.my-table tr:nth-child(even) {
-  background-color: #f2f2f2;
-}
+    .my-table tr:nth-child(even) {
+      background-color: #f2f2f2;
+    }
   </style>
 
 </head>
 <body>
- <div class="nav-bar">
-  <div>
-    <a href="{{ url_for('index') }}">Files</a>
+  <div class="nav-bar">
+    <a href="{{ url_for('index') }}" style="margin-right: auto;">Files</a>
+    {% if current_file %}
+      <a href="#" class="active" style="padding: 0; margin: 0;">{{ current_file }}</a>
+    {% endif %}
+    <a href="{{ url_for('unfamiliar_words') }}" style="margin-left: auto;">Dictionary</a>
   </div>
-  {% if current_file %}
-    <div>
-      <a href="#" class="active">{{ current_file }}</a>
-    </div>
-  {% endif %}
-  <div>
-    <a href="{{ url_for('unfamiliar_words') }}">Dictionary</a>
-  </div>
-</div>
   {% block content %}{% endblock %}
 </body>
 </html>
