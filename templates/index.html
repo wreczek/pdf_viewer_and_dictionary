@@ -8,7 +8,13 @@
     <h1>List of Uploaded PDFs</h1>
     <ul>
         {% for pdf_file in pdf_files %}
-            <li><a href="/file/{{ pdf_file }}">{{ pdf_file }}</a></li>
+<!--            <li><a href="/file/{{ pdf_file }}">{{ pdf_file }}</a></li>-->
+
+            <div class="nav-bar">
+              <div>
+                <a href="/files/{{ pdf_file }}">{{ pdf_file }} </a>
+              </div>
+            </div>
         {% endfor %}
     </ul>
 {% endblock %}
