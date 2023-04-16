@@ -13,8 +13,8 @@ app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
 def index():
     # Get a list of all the PDF files in the upload folder
     pdf_files = [f for f in os.listdir(app.config['UPLOAD_FOLDER']) if f.endswith('.pdf')]
-    # Render the index.html template with the list of PDF files
-    return render_template('index.html', pdf_files=pdf_files)
+    # Render the home.html template with the list of PDF files
+    return render_template('home.html', pdf_files=pdf_files)
 
 
 @app.route('/unfamiliar_words')
@@ -28,28 +28,21 @@ def unfamiliar_words():
     return render_template('unfamiliar_words.html', word_list=word_list)
 
 
-# TODO: wyswietla tylko bar
 @app.route('/pdf_viewer/<path:filename>')
 def pdf_viewer(filename):
     # Render the PDF viewer template with the current file variable
     return render_template('pdf_viewer.html', file_name=filename)
 
 
-# TODO: wyswietla bar + filename, ale zamiast pdf-a jest NOT FOUND
-@app.route('/test/<filename>')
-def test_pdf(filename):
-    return render_template('file.html', file_name=filename)
+# # TODO: wyswietla sam pdf, chcemy pdf z barem
+# @app.route('/files/<path:filename>')
+# def files(filename):
+#     """Serve a PDF file from the pdf directory."""
+#     # pdf_dir = os.path.join(app.root_path, 'static', 'pdf')
+#     pdf_dir = os.path.join(app.root_path, 'documents')
+#     return send_from_directory(pdf_dir, filename, as_attachment=False)
 
 
-# TODO: wyswietla sam pdf, chcemy pdf z barem
-@app.route('/files/<path:filename>')
-def view_pdf(filename):
-    """Serve a PDF file from the pdf directory."""
-    # pdf_dir = os.path.join(app.root_path, 'static', 'pdf')
-    pdf_dir = os.path.join(app.root_path, 'documents')
-    return send_from_directory(pdf_dir, filename, as_attachment=False)
-
-
-@app.route('/pdf/<path:path>')
-def pdf(path):
-    return send_file(os.path.join(app.root_path, 'documents', path))
+@app.route('/pdf/<path:filename>')
+def pdf(filename):
+    return send_file(os.path.join(app.root_path, 'documents', filename))
