@@ -4,35 +4,77 @@
   <title>{% block title %}{% endblock %}</title>
   <link rel="stylesheet" href="{{ url_for('static', filename='css/bootstrap.min.css') }}">
   <script src="{{ url_for('static', filename='js/jquery.min.js') }}"></script>
-  <script src="{{ url_for('static', filename='js/bootstrap.bundle.min.js') }}"></script>
+  <script src="{{ url_for('static', filename='js/bootstrap.min.js') }}"></script>
   <style>
-    .navbar {
+    .nav-bar {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
       background-color: #f8f9fa;
-      padding-top: 1rem;
-      padding-bottom: 1rem;
+      padding: 10px;
     }
-    .navbar-brand {
-      font-size: 1.5rem;
-      font-weight: bold;
-    }
-    .nav-link {
+    .nav-bar a {
+      text-decoration: none;
       color: black;
-      font-size: 1.2rem;
-      font-weight: bold;
+      font-size: 18px;
+      margin-right: 10px;
+    }
+    .nav-bar a:hover {
+      text-decoration: underline;
+    }
+
+    .my-table {
+      border-collapse: collapse;
+      width: 100%;
+    }
+
+    .my-table th,
+    .my-table td {
+      text-align: left;
+      padding: 8px;
+    }
+
+    .my-table th {
+      background-color: #007bff;
+      color: white;
+    }
+
+    .my-table tr:nth-child(even) {
+      background-color: #f2f2f2;
+    }
+
+    .nav-button {
+      color: white;
+      background-color: #007bff;
+      border-color: #007bff;
+      border-radius: 5px;
+      padding: 10px;
+      margin-right: 10px;
+    }
+
+    .nav-button:hover {
+      background-color: #0062cc;
+      border-color: #005cbf;
+    }
+
+    .nav-button:focus {
+      box-shadow: 0 0 0 0.2rem rgba(0, 123, 255, 0.5);
     }
   </style>
 
 </head>
 <body>
-  <nav class="navbar navbar-expand-lg navbar-light">
-    <div class="container-fluid">
-      <a class="navbar-brand" href="{{ url_for('index') }}">Files</a>
-      {% if current_file %}
-        <a class="nav-link active" href="#">{{ current_file }}</a>
-      {% endif %}
-      <a class="nav-link" href="{{ url_for('unfamiliar_words') }}">Dictionary</a>
+ <div class="nav-bar">
+  <div>
+    <a href="{{ url_for('index') }}" class="nav-button">Files</a>
+    <a href="{{ url_for('unfamiliar_words') }}" class="nav-button">Dictionary</a>
+  </div>
+  {% if current_file %}
+    <div>
+      <a href="#" class="active">{{ current_file }}</a>
     </div>
-  </nav>
+  {% endif %}
+</div>
   {% block content %}{% endblock %}
 </body>
 </html>
