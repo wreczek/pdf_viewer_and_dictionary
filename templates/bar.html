@@ -2,10 +2,16 @@
 <html>
 <head>
   <title>{% block title %}{% endblock %}</title>
-  <link rel="stylesheet" href="{{ url_for('static', filename='css/bootstrap.min.css') }}">
+<!--  <link rel="stylesheet" href="{{ url_for('static', filename='css/bootstrap.min.css') }}">  cos psuje-->
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/styles.css') }}">
+
   <script src="{{ url_for('static', filename='js/jquery.min.js') }}"></script>
   <script src="{{ url_for('static', filename='js/bootstrap.min.js') }}"></script>
+
   <style>
+  body {
+      background-color: #0077be;
+    }
     .nav-bar {
       display: flex;
       justify-content: space-between;
@@ -33,24 +39,25 @@
     }
 
     .my-table {
-      border-collapse: collapse;
-      width: 100%;
+        border-collapse: collapse;
+        width: 100%;
     }
 
     .my-table th,
     .my-table td {
-      text-align: left;
-      padding: 8px;
+        text-align: left;
+        padding: 8px;
     }
 
     .my-table th {
-      background-color: #007bff;
-      color: white;
+        background-color: #f2f2f2;  /* Light gray background for table headers */
+        color: black;  /* Text color for table headers */
     }
 
     .my-table tr:nth-child(even) {
-      background-color: #f2f2f2;
+        background-color: #ffffff;  /* White background for even rows */
     }
+
   </style>
 
 </head>

@@ -1,20 +1,27 @@
 {% extends 'bar.html' %}
 
-{% block title %}
-    Files
-{% endblock %}
-
 {% block content %}
     <h1>List of Uploaded PDFs</h1>
-    <ul>
-        {% for pdf_file in pdf_files %}
-<!--            <li><a href="/file/{{ pdf_file }}">{{ pdf_file }}</a></li>-->
-
-            <div class="nav-bar">
-              <div>
-                <a href="/pdf_viewer/{{ pdf_file }}">{{ pdf_file }} </a>
-              </div>
-            </div>
-        {% endfor %}
-    </ul>
+    <table class="my-table">
+        <thead>
+            <tr>
+                <th>File Name</th>
+                <th>Upload Date</th>
+                <th>Access Date</th>
+                <th>Status</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for pdf_file_info in pdf_files_info %}
+                <tr>
+                    <td>
+                        <a href="/pdf_viewer/{{ pdf_file_info['name'] }}">{{ pdf_file_info['name'] }}</a>
+                    </td>
+                    <td>{{ pdf_file_info['upload_date'] }}</td>
+                    <td>{{ pdf_file_info['access_date'] }}</td>
+                    <td>{{ pdf_file_info['status'] }}</td>
+                </tr>
+            {% endfor %}
+        </tbody>
+    </table>
 {% endblock %}
