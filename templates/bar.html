@@ -1,87 +1,10 @@
-<!DOCTYPE html>
 <html>
 
 <head>
   <title>{% block title %}{% endblock %}</title>
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css"
     crossorigin="anonymous" />
-
-  <style>
-    body {
-      background-color: #d6e8f8;
-    }
-
-    .nav-bar {
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      background-color: #28a745;
-      padding: 10px;
-      text-align: center;
-    }
-
-    .nav-bar a {
-      display: inline-block;
-      text-decoration: none;
-      color: black;
-      font-size: 18px;
-      margin-right: 10px;
-      padding: 10px 20px;
-      background-color: #e9ecef;
-      border: none;
-      border-radius: 4px;
-      transition: background-color 0.2s ease-in-out;
-    }
-
-    .nav-bar a:hover {
-      background-color: #007bff;
-      color: white;
-    }
-
-    .my-table {
-      border-collapse: collapse;
-      width: 100%;
-    }
-
-    .my-table th,
-    .my-table td {
-      text-align: left;
-      padding: 8px;
-    }
-
-    .my-table th {
-      background-color: #f2f2f2;
-      /* Light gray background for table headers */
-      color: black;
-      /* Text color for table headers */
-    }
-
-    .my-table tr:nth-child(even) {
-      background-color: #8cc5a8;
-      /* black green background for even rows */
-    }
-
-    .my-table tr:nth-child(odd) {
-      background-color: #D6EEEE;
-      /* White green background for odd rows */
-    }
-
-    .upload-icon {
-      margin-left: auto;
-      cursor: pointer;
-    }
-
-    .upload-icon i {
-      font-size: 37px;
-      /* Adjust the size as needed */
-    }
-
-    .upload-icon:hover i {
-      color: #007bff;
-      /* Change the color on hover */
-    }
-
-  </style>
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/styles.css') }}">
 </head>
 
 <body>
