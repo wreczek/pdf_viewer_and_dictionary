@@ -1,13 +1,13 @@
 import os
 import csv
 
-from flask import Flask, render_template, send_from_directory, send_file, url_for, request
+from flask import Flask, render_template, send_from_directory, send_file, url_for, request, redirect
 
 from utils import get_status, get_upload_date, get_access_date
 
 app = Flask(__name__)
 
-UPLOAD_FOLDER = "./documents"
+UPLOAD_FOLDER = "documents"
 app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
 
 
@@ -30,6 +30,8 @@ def index():
             'status': status
         })
 
+    pdf_files_info.sort(key=lambda x: x['access_date'], reverse=True)
+
     return render_template('home.html', pdf_files_info=pdf_files_info)
 
 
@@ -47,11 +49,52 @@ def unfamiliar_words():
     return render_template('unfamiliar_words.html', word_list=word_list)
 
 
-@app.route('/pdf_viewer/<path:filename>')
-def pdf_viewer(filename):
-    return render_template('pdf_viewer.html', file_name=filename)
-
-
 @app.route('/pdf/<path:filename>')
 def pdf(filename):
-    return send_file(os.path.join(app.root_path, 'documents', filename))
+    directory = os.path.join(app.root_path, 'documents')
+    return send_from_directory(directory, filename)
+
+
+@app.route('/pdf_viewer/<path:filename>')
+def pdf_viewer(filename):
+    pdf_path = url_for('pdf', filename=filename)
+    return render_template('pdf_viewer.html',
+                           file_name=filename,
+                           pdf_path=pdf_path)
+
+
+@app.route('/upload', methods=['POST'])
+def upload_file():
+    if 'file' not in request.files:
+        return redirect(request.url)
+
+    file = request.files['file']
+
+    if file.filename == '':
+        return redirect(request.url)
+
+    if file:
+        filename = os.path.join(app.config['UPLOAD_FOLDER'], file.filename)
+        file.save(filename)
+        return redirect(url_for('index'))
+
+    return 'Upload failed'
+
+
+@app.route('/upload', methods=['GET', 'POST'])
+def upload_file2():
+    if request.method == 'POST':
+        if 'file' not in request.files:
+            return redirect(request.url)
+
+        file = request.files['file']
+
+        if file.filename == '':
+            return redirect(request.url)
+
+        if file:
+            filename = os.path.join(app.config['UPLOAD_FOLDER'], file.filename)
+            file.save(filename)
+            return redirect(url_for('index'))
+
+    return render_template('upload.html')

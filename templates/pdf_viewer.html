@@ -6,7 +6,6 @@
 
 {% block content %}
   <div class="container">
-    <h1>{{ file_name }}</h1>
-    <iframe src="{{ url_for('pdf', filename=file_name) }}" width="100%" height="800px"></iframe>
+    <iframe src="{{ pdf_path }}" width="100%" height="800px"></iframe>
   </div>
 {% endblock %}

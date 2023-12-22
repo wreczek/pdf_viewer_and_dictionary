@@ -1,26 +1,31 @@
 <!DOCTYPE html>
+
 <html>
+
 <head>
   <title>{% block title %}{% endblock %}</title>
 <!--  <link rel="stylesheet" href="{{ url_for('static', filename='css/bootstrap.min.css') }}">  cos psuje-->
-  <link rel="stylesheet" href="{{ url_for('static', filename='css/styles.css') }}">
+<!--  <link rel="stylesheet" href="{{ url_for('static', filename='css/styles.css') }}">-->
 
-  <script src="{{ url_for('static', filename='js/jquery.min.js') }}"></script>
-  <script src="{{ url_for('static', filename='js/bootstrap.min.js') }}"></script>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css" crossorigin="anonymous" />
+
+<!--  <script src="{{ url_for('static', filename='js/jquery.min.js') }}"></script>-->
+<!--  <script src="{{ url_for('static', filename='js/bootstrap.min.js') }}"></script>-->
 
   <style>
   body {
-      background-color: #0077be;
-    }
+      background-color: #d6e8f8;
+  }
+
     .nav-bar {
       display: flex;
-      justify-content: space-between;
+      justify-content: center;
       align-items: center;
-      background-color: #f8f9fa;
+      background-color: #28a745;
       padding: 10px;
       text-align: center;
-      justify-content: center;
     }
+
     .nav-bar a {
       display: inline-block;
       text-decoration: none;
@@ -55,26 +60,53 @@
     }
 
     .my-table tr:nth-child(even) {
-        background-color: #ffffff;  /* White background for even rows */
+        background-color: #8cc5a8 ;  /* black green background for even rows */
+    }
+
+    .my-table tr:nth-child(odd) {
+        background-color: #D6EEEE;  /* White green background for odd rows */
+    }
+
+    .upload-icon i {
+      font-size: 37px; /* Adjust the size as needed */
+    }
+
+    .upload-icon:hover i {
+      color: #007bff; /* Change the color on hover */
+    }
+
+    .upload-icon {
+      margin-left: auto;
     }
 
   </style>
-
 </head>
+
 <body>
   <div class="nav-bar">
     <div>
       <a href="{{ url_for('index') }}">Files</a>
     </div>
+
     {% if current_file %}
-    <div>
-      <a href="#" class="active">{{ current_file }}</a>
-    </div>
+      <div>
+        <a href="#" class="active">{{ current_file }}</a>
+      </div>
     {% endif %}
+
     <div>
       <a href="{{ url_for('unfamiliar_words') }}">Dictionary</a>
     </div>
+
+   <div class="upload-icon">
+      <a href="{{ url_for('upload_file2') }}">
+        <i class="fas fa-upload"></i>
+      </a>
+    </div>
+
+
   </div>
   {% block content %}{% endblock %}
 </body>
+
 </html>
