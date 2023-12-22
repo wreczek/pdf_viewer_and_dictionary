@@ -1,12 +1,13 @@
-<!DOCTYPE html>
-<html>
-<head>
-    <title>File Upload</title>
-</head>
-<body>
-    <form action="{{ url_for('upload_file') }}" method="post" enctype="multipart/form-data">
-        <input type="file" name="file">
-        <input type="submit" value="Upload">
+{% extends 'bar.html' %}
+
+{% block title %}
+    Upload
+{% endblock %}
+
+{% block content %}
+    <h1>File Upload</h1>
+    <form method="POST" action="" enctype="multipart/form-data">
+        <p><input type="file" name="file"></p>
+        <p><input type="submit" value="Submit"></p>
     </form>
-</body>
-</html>
+{% endblock %}

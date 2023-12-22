@@ -64,26 +64,8 @@ def pdf_viewer(filename):
                            pdf_path=pdf_path)
 
 
-@app.route('/upload', methods=['POST'])
-def upload_file():
-    if 'file' not in request.files:
-        return redirect(request.url)
-
-    file = request.files['file']
-
-    if file.filename == '':
-        return redirect(request.url)
-
-    if file:
-        filename = os.path.join(app.config['UPLOAD_FOLDER'], file.filename)
-        file.save(filename)
-        return redirect(url_for('index'))
-
-    return 'Upload failed'
-
-
 @app.route('/upload', methods=['GET', 'POST'])
-def upload_file2():
+def upload_file():
     if request.method == 'POST':
         if 'file' not in request.files:
             return redirect(request.url)
