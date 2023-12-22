@@ -60,6 +60,7 @@ def pdf_viewer(filename):
     pdf_path = url_for('pdf', filename=filename)
     return render_template('pdf_viewer.html',
                            file_name=filename,
+                           current_file=filename,
                            pdf_path=pdf_path)
 
 
