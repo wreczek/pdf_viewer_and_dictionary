@@ -10,14 +10,18 @@
 <body>
   <div class="nav-bar">
     <div>
-      <a href="{{ url_for('index') }}">Files</a>
+      <a href="{{ url_for('pdf_viewer_home') }}">Files</a>
     </div>
 
-    {% if current_file %}
-      <div>
-        <a href="#" class="active">{{ current_file }}</a>
-      </div>
-    {% endif %}
+    <div>
+      <a href="/#" class="active">
+        {% if current_file %}
+          {{ current_file }}
+        {% else %}
+          Current file
+        {% endif %}
+      </a>
+    </div>
 
     <div>
       <a href="{{ url_for('unfamiliar_words') }}">Dictionary</a>

@@ -1,0 +1,31 @@
+{% extends 'bar.html' %}
+
+{% block title %}
+    Files list
+{% endblock %}
+
+{% block content %}
+    <h1>List of Uploaded PDFs</h1>
+    <table class="my-table">
+        <thead>
+            <tr>
+                <th>File Name</th>
+                <th>Upload Date</th>
+                <th>Access Date</th>
+                <th>Status</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for pdf_file_info in pdf_files_info %}
+                <tr>
+                    <td>
+                        <a href="/pdf_viewer/{{ pdf_file_info['name'] }}">{{ pdf_file_info['name'] }}</a>
+                    </td>
+                    <td>{{ pdf_file_info['upload_date'] }}</td>
+                    <td>{{ pdf_file_info['access_date'] }}</td>
+                    <td>{{ pdf_file_info['status'] }}</td>
+                </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+{% endblock %}

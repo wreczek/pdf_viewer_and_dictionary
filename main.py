@@ -13,6 +13,11 @@ app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
 
 @app.route('/')
 def index():
+    return render_template("home.html")
+
+
+@app.route('/pdf_viewer')
+def pdf_viewer_home():
     pdf_files = [f for f in os.listdir(app.config['UPLOAD_FOLDER']) if f.endswith('.pdf')]
 
     pdf_files_info = []
@@ -32,12 +37,7 @@ def index():
 
     pdf_files_info.sort(key=lambda x: x['access_date'], reverse=True)
 
-    return render_template('home.html', pdf_files_info=pdf_files_info)
-
-
-@app.route('/pdf_viewer')
-def pdf_viewer_home():
-    return index()
+    return render_template('file_list.html', pdf_files_info=pdf_files_info)
 
 
 @app.route('/unfamiliar_words')
