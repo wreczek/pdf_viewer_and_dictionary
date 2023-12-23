@@ -13,7 +13,8 @@ app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
 
 @app.route('/')
 def index():
-    return render_template("home.html")
+    return render_template("home.html",
+                           active_page='index')
 
 
 @app.route('/pdf_viewer')
@@ -37,7 +38,9 @@ def pdf_viewer_home():
 
     pdf_files_info.sort(key=lambda x: x['access_date'], reverse=True)
 
-    return render_template('file_list.html', pdf_files_info=pdf_files_info)
+    return render_template('file_list.html',
+                           pdf_files_info=pdf_files_info,
+                           active_page='pdf_viewer_home')
 
 
 @app.route('/unfamiliar_words')
@@ -46,7 +49,9 @@ def unfamiliar_words():
         reader = csv.reader(f)
         word_list = list(reader)
 
-    return render_template('unfamiliar_words.html', word_list=word_list)
+    return render_template('unfamiliar_words.html',
+                           word_list=word_list,
+                           active_page='unfamiliar_words')
 
 
 @app.route('/pdf/<path:filename>')
@@ -61,7 +66,8 @@ def pdf_viewer(filename):
     return render_template('pdf_viewer.html',
                            file_name=filename,
                            current_file=filename,
-                           pdf_path=pdf_path)
+                           pdf_path=pdf_path,
+                           active_page='pdf_viewer')
 
 
 @app.route('/upload', methods=['GET', 'POST'])
@@ -80,4 +86,5 @@ def upload_file():
             file.save(filename)
             return redirect(url_for('index'))
 
-    return render_template('upload.html')
+    return render_template('upload.html',
+                           active_page='upload_file')

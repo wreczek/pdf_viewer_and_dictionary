@@ -67,3 +67,6 @@ body {
     padding: 10px; /* Add padding for better visual appearance */
 }
 
+.nav-bar a.active {
+    border: 3px solid red; /* Add your preferred border style here */
+}

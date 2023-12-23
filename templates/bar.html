@@ -10,11 +10,12 @@
 <body>
   <div class="nav-bar">
     <div>
-      <a href="{{ url_for('pdf_viewer_home') }}">Files</a>
+      <a href="{{ url_for('pdf_viewer_home') }}" {% if active_page == 'pdf_viewer_home' %}class="active"{% endif %}>Files</a>
     </div>
 
     <div>
-      <a href="/#" class="active">
+<!--      <a href="#" {% if current_file %}class="active"{% endif %}>-->
+      <a href="#" {% if active_page == 'pdf_viewer' %}class="active"{% endif %}>
         {% if current_file %}
           {{ current_file }}
         {% else %}
@@ -23,8 +24,9 @@
       </a>
     </div>
 
+
     <div>
-      <a href="{{ url_for('unfamiliar_words') }}">Dictionary</a>
+      <a href="{{ url_for('unfamiliar_words') }}" {% if active_page == 'unfamiliar_words' %}class="active"{% endif %}>Dictionary</a>
     </div>
 
     <div class="upload-icon" onclick="document.getElementById('file-input').click();">
