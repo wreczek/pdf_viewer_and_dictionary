@@ -30,6 +30,20 @@
             <option value="hard">Hard</option>
         </select>
 
+        <label for="sort_by">Sort by:</label>
+        <select name="sort_by" id="sort_by">
+            <option value="-1">None</option>
+            <option value="0">Column 1</option>
+            <option value="1">Column 2</option>
+            <option value="2">Column 3</option>
+            <option value="3">Column 4</option>
+            <option value="4">Column 5</option>
+            <!-- Add options for other columns as needed -->
+        </select>
+
+        <label for="reverse_sort">Reverse Sort:</label>
+        <input type="checkbox" name="reverse_sort" id="reverse_sort">
+
         <input type="submit" value="Apply Filter">
     </form>
 

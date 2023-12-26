@@ -4,7 +4,8 @@ import csv
 from flask import Flask, render_template, send_from_directory, send_file, url_for, request, redirect
 
 from config import load_config
-from utils import get_status, get_upload_date, get_access_date, get_available_files, apply_filters
+from utils import get_status, get_upload_date, get_access_date, get_available_files, apply_filters, \
+    sort_records
 
 app = Flask(__name__)
 
@@ -54,16 +55,19 @@ def unfamiliar_words():
         reader = csv.reader(f)
         csv_header, *word_list = list(reader)
 
-    available_files = get_available_files()
-
     selected_file = request.form.get('file', '')
     selected_date = request.form.get('date', '')
     selected_difficulty = request.form.get('difficulty', '')
+    sort_by = request.form.get('sort_by', '-1')
+    is_reversed = request.form.get('reverse_sort', 'False')
 
     filtered_word_list = apply_filters(word_list, selected_file, selected_date, selected_difficulty)
+    filtered_and_sorted_word_list = sort_records(sort_by, is_reversed, filtered_word_list)
+
+    available_files = get_available_files()
 
     return render_template('unfamiliar_words.html',
-                           filtered_word_list=filtered_word_list,
+                           filtered_word_list=filtered_and_sorted_word_list,
                            available_files=available_files,
                            csv_header=csv_header,
                            active_page='unfamiliar_words')
