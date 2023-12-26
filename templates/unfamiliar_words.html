@@ -6,27 +6,52 @@
 {% endblock %}
 
 {% block content %}
- <div class="container">
-  <h1>List of Unfamiliar Words</h1>
-  <table class="table table-striped my-table">
-    <thead>
-      <tr>
-        <th>Word</th>
-        <th>Translation</th>
-        <th>Book</th>
-        <th>Difficulty</th>
-      </tr>
-    </thead>
-    <tbody>
-      {% for word in word_list %}
-        <tr>
-          <td>{{ word[0] }}</td>
-          <td>{{ word[1] }}</td>
-          <td>{{ word[2] }}</td>
-          <td>{{ word[3] }}</td>
-        </tr>
-      {% endfor %}
-    </tbody>
-  </table>
-   </div>
+<div class="container">
+    <h1>List of Unfamiliar Words</h1>
+
+    <!-- Add a filter form -->
+    <form method="post" action="{{ url_for('unfamiliar_words') }}" class="filter-form">
+        <label for="file">Filter by File:</label>
+        <select name="file" id="file">
+            <option value="">All</option>
+            {% for file in available_files %}
+                <option value="{{ file }}">{{ file }}</option>
+            {% endfor %}
+        </select>
+
+        <label for="date">Filter by Date:</label>
+        <input type="date" name="date" id="date">
+
+        <label for="difficulty">Filter by Difficulty:</label>
+        <select name="difficulty" id="difficulty">
+            <option value="">All</option>
+            <option value="easy">Easy</option>
+            <option value="medium">Medium</option>
+            <option value="hard">Hard</option>
+        </select>
+
+        <input type="submit" value="Apply Filter">
+    </form>
+
+    <table class="table table-striped my-table">
+        <thead>
+            <tr>
+                {% for header in csv_header %}
+                    <th>{{ header }}</th>
+                {% endfor %}
+            </tr>
+        </thead>
+        <tbody>
+            {% for word in filtered_word_list %}
+                <tr>
+                    <td>{{ word[0] }}</td>
+                    <td>{{ word[1] }}</td>
+                    <td>{{ word[2] }}</td>
+                    <td>{{ word[3] }}</td>
+                    <td>{{ word[4] }}</td>
+                </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
 {% endblock %}

@@ -3,11 +3,16 @@ import csv
 
 from flask import Flask, render_template, send_from_directory, send_file, url_for, request, redirect
 
-from utils import get_status, get_upload_date, get_access_date
+from config import load_config
+from utils import get_status, get_upload_date, get_access_date, get_available_files, apply_filters
 
 app = Flask(__name__)
 
-UPLOAD_FOLDER = "documents"
+config = load_config()
+
+UPLOAD_FOLDER = config.upload_folder
+DB_PATH = config.db_path
+
 app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
 
 
@@ -19,7 +24,7 @@ def index():
 
 @app.route('/pdf_viewer')
 def pdf_viewer_home():
-    pdf_files = [f for f in os.listdir(app.config['UPLOAD_FOLDER']) if f.endswith('.pdf')]
+    pdf_files = get_available_files()
 
     pdf_files_info = []
 
@@ -43,14 +48,24 @@ def pdf_viewer_home():
                            active_page='pdf_viewer_home')
 
 
-@app.route('/unfamiliar_words')
+@app.route('/unfamiliar_words', methods=['GET', 'POST'])
 def unfamiliar_words():
-    with open('./db/unfamiliar_words.csv', 'r', encoding='utf-8') as f:
+    with open(DB_PATH, 'r', encoding='utf-8') as f:
         reader = csv.reader(f)
-        word_list = list(reader)
+        csv_header, *word_list = list(reader)
+
+    available_files = get_available_files()
+
+    selected_file = request.form.get('file', '')
+    selected_date = request.form.get('date', '')
+    selected_difficulty = request.form.get('difficulty', '')
+
+    filtered_word_list = apply_filters(word_list, selected_file, selected_date, selected_difficulty)
 
     return render_template('unfamiliar_words.html',
-                           word_list=word_list,
+                           filtered_word_list=filtered_word_list,
+                           available_files=available_files,
+                           csv_header=csv_header,
                            active_page='unfamiliar_words')
 
 
