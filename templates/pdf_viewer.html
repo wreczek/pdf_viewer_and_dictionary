@@ -9,19 +9,5 @@
     <iframe id="pdfViewer" src="{{ pdf_path }}" width="100%" height="800px"></iframe>
   </div>
 
-  <script>
-    // Retrieve the last position from the server
-    var lastPosition = "{{ last_position }}";
-
-    // Set the last position if available
-    if (lastPosition) {
-        document.getElementById('pdfViewer').contentWindow.scrollTo(0, lastPosition);
-    }
-
-    // Save the scroll position on window unload
-    window.addEventListener('beforeunload', function() {
-        var scrollPosition = document.getElementById('pdfViewer').contentWindow.scrollY;
-        document.cookie = `last_position_{{ current_file }}=${scrollPosition}`;
-    });
-  </script>
+  <script src="{{ url_for('static', filename='js/scripts.js') }}"></script>
 {% endblock %}
