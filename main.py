@@ -2,7 +2,7 @@ import os
 import csv
 
 import pandas as pd
-from flask import Flask, render_template, send_from_directory, send_file, url_for, request, \
+from flask import Flask, render_template, send_from_directory, url_for, request, \
     redirect, jsonify
 
 from config import load_config
@@ -84,10 +84,15 @@ def pdf(filename):
 @app.route('/pdf_viewer/<path:filename>')
 def pdf_viewer(filename):
     pdf_path = url_for('pdf', filename=filename)
+
+    # Retrieve the last stored position from localStorage
+    last_position = request.cookies.get(f'last_position_{filename}')
+
     return render_template('pdf_viewer.html',
                            file_name=filename,
                            current_file=filename,
                            pdf_path=pdf_path,
+                           last_position=last_position,  # Pass last_position to the template
                            active_page='pdf_viewer')
 
 
