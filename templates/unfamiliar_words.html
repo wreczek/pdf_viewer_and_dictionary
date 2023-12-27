@@ -61,13 +61,14 @@
         </div>
     </form>
 
-<!-- ... (previous code) ... -->
 <!-- Table -->
 <table class="table table-striped my-table mt-4">
     <thead>
         <tr>
             {% for header in csv_header %}
-                <th>{{ header }}</th>
+                {% if header != 'id' %}  <!-- Exclude the 'id' column -->
+                    <th>{{ header }}</th>
+                {% endif %}
             {% endfor %}
             <th>Actions</th>  <!-- Add a new column for Actions -->
         </tr>

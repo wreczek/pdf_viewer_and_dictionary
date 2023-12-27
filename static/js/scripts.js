@@ -1,5 +1,3 @@
-// scripts.js
-
 function showWordDetails(word, translation, book, date, difficulty, wordId) {
     // Display word details in the modal
     document.getElementById('wordDetails').innerHTML = `
