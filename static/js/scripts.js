@@ -68,45 +68,21 @@ function removeWord() {
     });
 }
 
-function fetchAndRefreshContent() {
-    // Use AJAX or Fetch API to fetch updated data from the server
-    // Update the URL and other parameters based on your application
-    fetch('/get_updated_content')
-        .then(response => response.json())
-        .then(data => {
-            // Update the content on the page with the fetched data
-            document.getElementById('refreshedContent').innerHTML = data.html;
-        })
-        .catch(error => {
-            console.error('Error fetching data:', error);
-        });
+// Assuming this function is called to fetch and update content
+async function fetchAndRefreshContent() {
+  try {
+    const response = await fetch('/get_updated_content');
+    const data = await response.json();
+
+    // Assuming 'content-container' is the container where you want to update the HTML
+    document.getElementById('refreshedContent').innerHTML = data.html;
+  } catch (error) {
+    console.error('Error fetching data:', error);
+  }
 }
 
-//const eventSource = new EventSource("/listen_for_updates");
-//
-//eventSource.onmessage = function (event) {
-//// Handle the event data (update the content, etc.)
-//const data = JSON.parse(event.data);
-//document.getElementById('refreshedContent').innerHTML = data.html;
-//};
-
-//// Assuming this function is called to fetch and update content
-//async function fetchAndUpdateContent() {
-//  try {
-//    const response = await fetch('/get_updated_content');
-//    const data = await response.json();
-//
-//    // Assuming 'content-container' is the container where you want to update the HTML
-//    document.getElementById('content-container').innerHTML = data.html;
-//  } catch (error) {
-//    console.error('Error fetching data:', error);
-//  }
-//}
-
 // Set an interval to fetch and refresh content every 5 seconds (adjust as needed)
-//setInterval(fetchAndRefreshContent, 3000);
-
-// scripts.js
+setInterval(fetchAndRefreshContent, 3000);
 
 // Function to set the last position for the PDF viewer
 function setLastPosition(lastPosition, currentFile) {
