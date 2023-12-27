@@ -51,16 +51,20 @@ function removeWord() {
         if (!response.ok) {
             throw new Error('Network response was not ok');
         }
-        // Assuming the server returns some indication of success
+
+        // Ensure the server response is valid JSON
         return response.json();
     })
     .then(data => {
-        // Handle success (e.g., update UI, refresh page, etc.)
-        console.log('Word removed successfully:', data);
-        // Close the modal
-        var wordDetailsModal = new bootstrap.Modal(document.getElementById('wordDetailsModal'));
-        wordDetailsModal.hide();
-        // Optionally, refresh the page or update the table
+    // Ensure data is defined before logging
+    console.log('Word removed successfully:', data);
+
+    // Close the modal
+    var wordDetailsModal = new bootstrap.Modal(document.getElementById('wordDetailsModal'));
+    wordDetailsModal.hide();
+
+    // Fetch and refresh content after removal
+    fetchAndRefreshContent();
     })
     .catch(error => {
         // Handle errors (e.g., show an error message)
@@ -70,9 +74,14 @@ function removeWord() {
 
 // Assuming this function is called to fetch and update content
 async function fetchAndRefreshContent() {
+    // Log message before the fetch request
+    console.log('Fetching and refreshing content...');
+
   try {
     const response = await fetch('/get_updated_content');
     const data = await response.json();
+
+    console.log('Content fetched and refreshed successfully:', data);
 
     // Assuming 'content-container' is the container where you want to update the HTML
     document.getElementById('refreshedContent').innerHTML = data.html;
@@ -82,7 +91,7 @@ async function fetchAndRefreshContent() {
 }
 
 // Set an interval to fetch and refresh content every 5 seconds (adjust as needed)
-setInterval(fetchAndRefreshContent, 3000);
+setInterval(fetchAndRefreshContent, 10000);
 
 // Function to set the last position for the PDF viewer
 function setLastPosition(lastPosition, currentFile) {
