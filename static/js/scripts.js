@@ -1,6 +1,6 @@
 // scripts.js
 
-function showWordDetails(word, translation, book, date, difficulty) {
+function showWordDetails(word, translation, book, date, difficulty, wordId) {
     // Display word details in the modal
     document.getElementById('wordDetails').innerHTML = `
         <strong>Word:</strong> ${word}<br>
@@ -9,6 +9,9 @@ function showWordDetails(word, translation, book, date, difficulty) {
         <strong>Date:</strong> ${date}<br>
         <strong>Difficulty:</strong> ${difficulty}
     `;
+
+    // Set the wordId as a data attribute on the modal
+    document.getElementById('wordDetailsModal').setAttribute('data-word-id', wordId);
 
     // Show the modal
     var wordDetailsModal = new bootstrap.Modal(document.getElementById('wordDetailsModal'));
@@ -27,8 +30,17 @@ function acceptChanges() {
 }
 
 function removeWord() {
-    // Get the word ID from the modal (assuming it's in a data attribute)
+    // Get the word ID from the modal (data attribute)
     var wordId = document.getElementById('wordDetailsModal').getAttribute('data-word-id');
+
+    // Log the wordId to the console for debugging
+    console.log('Word ID:', wordId);
+
+    // Check if wordId is available
+    if (!wordId) {
+        console.error('Word ID not found.');
+        return;
+    }
 
     // Assuming you have a Flask route for deleting words, modify the URL accordingly
     var deleteUrl = `/delete_word/${wordId}`;

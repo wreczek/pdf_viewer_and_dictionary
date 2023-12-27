@@ -1,7 +1,8 @@
 import os
 import csv
 
-from flask import Flask, render_template, send_from_directory, send_file, url_for, request, redirect
+from flask import Flask, render_template, send_from_directory, send_file, url_for, request, \
+    redirect, jsonify
 
 from config import load_config
 from utils import get_status, get_upload_date, get_access_date, get_available_files, apply_filters, \
@@ -109,6 +110,9 @@ def upload_file():
                            active_page='upload_file')
 
 
-@app.route('/delete_word/<wordId>')
-def delete_word():
-    pass
+@app.route('/delete_word/<wordId>', methods=['DELETE'])
+def delete_word(wordId):
+    print(f"Received DELETE request for word ID: {wordId}")
+    # Your logic to delete the word with the given ID
+    # ...
+    return jsonify({'message': 'Word deleted successfully', 'wordId': wordId})
