@@ -7,65 +7,109 @@
 
 {% block content %}
 <div class="container">
-    <h1>List of Unfamiliar Words</h1>
+    <h1 class="mb-4">List of Unfamiliar Words</h1>
 
-    <!-- Add a filter form -->
+    <!-- Filter Form -->
     <form method="post" action="{{ url_for('unfamiliar_words') }}" class="filter-form">
-        <label for="file">Filter by File:</label>
-        <select name="file" id="file">
-            <option value="">All</option>
-            {% for file in available_files %}
-                <option value="{{ file }}">{{ file }}</option>
-            {% endfor %}
-        </select>
+        <div class="row">
+            <div class="col-md-3 mb-3">
+                <label for="file" class="form-label">Filter by File:</label>
+                <select name="file" id="file" class="form-select">
+                    <option value="">All</option>
+                    {% for file in available_files %}
+                        <option value="{{ file }}">{{ file }}</option>
+                    {% endfor %}
+                </select>
+            </div>
 
-        <label for="date">Filter by Date:</label>
-        <input type="date" name="date" id="date">
+            <div class="col-md-3 mb-3">
+                <label for="date" class="form-label">Filter by Date:</label>
+                <input type="date" name="date" id="date" class="form-control">
+            </div>
 
-        <label for="difficulty">Filter by Difficulty:</label>
-        <select name="difficulty" id="difficulty">
-            <option value="">All</option>
-            <option value="easy">Easy</option>
-            <option value="medium">Medium</option>
-            <option value="hard">Hard</option>
-        </select>
+            <div class="col-md-3 mb-3">
+                <label for="difficulty" class="form-label">Filter by Difficulty:</label>
+                <select name="difficulty" id="difficulty" class="form-select">
+                    <option value="">All</option>
+                    <option value="easy">Easy</option>
+                    <option value="medium">Medium</option>
+                    <option value="hard">Hard</option>
+                </select>
+            </div>
 
-        <label for="sort_by">Sort by:</label>
-        <select name="sort_by" id="sort_by">
-            <option value="-1">None</option>
-            <option value="0">Column 1</option>
-            <option value="1">Column 2</option>
-            <option value="2">Column 3</option>
-            <option value="3">Column 4</option>
-            <option value="4">Column 5</option>
-            <!-- Add options for other columns as needed -->
-        </select>
+            <div class="col-md-3 mb-3">
+                <label for="sort_by" class="form-label">Sort by:</label>
+                <select name="sort_by" id="sort_by" class="form-select">
+                    <option value="-1">None</option>
+                    <option value="0">Column 1</option>
+                    <option value="1">Column 2</option>
+                    <option value="2">Column 3</option>
+                    <option value="3">Column 4</option>
+                    <option value="4">Column 5</option>
+                    <!-- Add options for other columns as needed -->
+                </select>
+            </div>
+        </div>
 
-        <label for="reverse_sort">Reverse Sort:</label>
-        <input type="checkbox" name="reverse_sort" id="reverse_sort">
+        <div class="form-check mb-3">
+            <input type="checkbox" class="form-check-input" name="reverse_sort" id="reverse_sort">
+            <label class="form-check-label" for="reverse_sort">Reverse Sort</label>
+        </div>
 
-        <input type="submit" value="Apply Filter">
+        <div class="d-grid">
+            <button type="submit" class="btn btn-primary">Apply Filter</button>
+        </div>
     </form>
 
-    <table class="table table-striped my-table">
-        <thead>
-            <tr>
-                {% for header in csv_header %}
-                    <th>{{ header }}</th>
-                {% endfor %}
-            </tr>
-        </thead>
-        <tbody>
-            {% for word in filtered_word_list %}
-                <tr>
-                    <td>{{ word[0] }}</td>
-                    <td>{{ word[1] }}</td>
-                    <td>{{ word[2] }}</td>
-                    <td>{{ word[3] }}</td>
-                    <td>{{ word[4] }}</td>
-                </tr>
+<!-- ... (previous code) ... -->
+<!-- Table -->
+<table class="table table-striped my-table mt-4">
+    <thead>
+        <tr>
+            {% for header in csv_header %}
+                <th>{{ header }}</th>
             {% endfor %}
-        </tbody>
-    </table>
+            <th>Actions</th>  <!-- Add a new column for Actions -->
+        </tr>
+    </thead>
+    <tbody>
+        {% for word in filtered_word_list %}
+            <tr>
+                <td>{{ word[0] }}</td>
+                <td>{{ word[1] }}</td>
+                <td>{{ word[2] }}</td>
+                <td>{{ word[3] }}</td>
+                <td>{{ word[4] }}</td>
+                <td>
+                    <button class="btn btn-info" onclick="showWordDetails('{{ word[0] }}', '{{ word[1] }}', '{{ word[2] }}', '{{ word[3] }}', '{{ word[4] }}')">Details</button>
+                </td>
+            </tr>
+        {% endfor %}
+    </tbody>
+</table>
+
+<!-- Modal for Word Details -->
+<div class="modal fade" id="wordDetailsModal" tabindex="-1" aria-labelledby="wordDetailsModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="wordDetailsModalLabel">Word Details</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close">Close</button>
+            </div>
+            <div class="modal-body">
+                <!-- Word details will be displayed here -->
+                <p id="wordDetails"></p>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-success" onclick="acceptChanges()">Accept</button>
+                <button type="button" class="btn btn-danger" onclick="removeWord()" data-bs-dismiss="modal">Remove</button>
+            </div>
+        </div>
+    </div>
 </div>
+
+</div>
+
+<script src="{{ url_for('static', filename='js/scripts.js') }}"></script>
+
 {% endblock %}

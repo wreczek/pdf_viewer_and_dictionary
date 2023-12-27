@@ -107,3 +107,8 @@ def upload_file():
 
     return render_template('upload.html',
                            active_page='upload_file')
+
+
+@app.route('/delete_word/<wordId>')
+def delete_word():
+    pass
