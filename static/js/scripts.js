@@ -91,7 +91,7 @@ async function fetchAndRefreshContent() {
 }
 
 // Set an interval to fetch and refresh content every 5 seconds (adjust as needed)
-setInterval(fetchAndRefreshContent, 10000);
+//setInterval(fetchAndRefreshContent, 10000);
 
 // Function to set the last position for the PDF viewer
 function setLastPosition(lastPosition, currentFile) {
