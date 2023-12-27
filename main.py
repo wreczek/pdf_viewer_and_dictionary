@@ -68,7 +68,7 @@ def unfamiliar_words():
 
     available_files = get_available_files()
 
-    return render_template('unfamiliar_words.html',
+    return render_template('dictionary.html',
                            filtered_word_list=filtered_and_sorted_word_list,
                            available_files=available_files,
                            csv_header=csv_header,
@@ -121,3 +121,40 @@ def delete_word(wordId):
     db_csv.to_csv(DB_PATH, index=False)
 
     return jsonify({'message': 'Word deleted successfully', 'wordId': wordId})
+
+
+@app.route('/get_updated_content')
+def get_updated_content():
+    # Fetch and serialize the updated content as JSON
+    updated_content = fetch_updated_content()
+
+    # Assuming fetch_updated_content returns a dictionary with an 'html' key
+    return jsonify({'html': updated_content})
+
+
+# This function should return the HTML content you want to update
+def fetch_updated_content():
+    # Similar to the logic in your 'unfamiliar_words' route
+    with open(DB_PATH, 'r', encoding='utf-8') as f:
+        reader = csv.reader(f)
+        csv_header, *word_list = list(reader)
+
+    selected_file = request.form.get('file', '')
+    selected_date = request.form.get('date', '')
+    selected_difficulty = request.form.get('difficulty', '')
+    sort_by = request.form.get('sort_by', '-1')
+    is_reversed = request.form.get('reverse_sort', 'False')
+
+    filtered_word_list = apply_filters(word_list, selected_file, selected_date, selected_difficulty)
+    filtered_and_sorted_word_list = sort_records(sort_by, is_reversed, filtered_word_list)
+
+    available_files = get_available_files()
+
+    # Render the template and return the HTML content
+    updated_content = render_template('dictionary_table.html',
+                                      filtered_word_list=filtered_and_sorted_word_list,
+                                      available_files=available_files,
+                                      csv_header=csv_header,
+                                      active_page='unfamiliar_words')
+
+    return updated_content

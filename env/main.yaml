@@ -1,4 +1,4 @@
 # config.yaml
 
 upload_folder: "documents"
-db_path: './db/test.csv'  # unfamiliar_words
+db_path: './db/unfamiliar_words.csv'  # unfamiliar_words

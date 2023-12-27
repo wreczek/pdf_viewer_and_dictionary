@@ -70,3 +70,21 @@ body {
 .nav-bar a.active {
     border: 3px solid red; /* Add your preferred border style here */
 }
+
+.home-icon {
+    cursor: pointer;
+    margin-left: 10px; /* Add margin for spacing between icons */
+    display: flex;
+    align-items: center;
+    padding: 10px; /* Add padding for better visual appearance */
+}
+
+.home-icon:hover {
+    background-color: #007bff;
+}
+
+.home-icon i {
+    font-size: 37px;
+    color: black; /* Set the initial color of the icon */
+    margin-right: 5px; /* Adjust as needed for spacing between icon and text */
+}
