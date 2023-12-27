@@ -61,55 +61,27 @@
         </div>
     </form>
 
-<!-- Table -->
-<div id="refreshedContent">
-<table class="table table-striped my-table mt-4">
-    <thead>
-        <tr>
-            {% for header in csv_header %}
-                {% if header != 'id' %}  <!-- Exclude the 'id' column -->
-                    <th>{{ header }}</th>
-                {% endif %}
-            {% endfor %}
-            <th>Actions</th>  <!-- Add a new column for Actions -->
-        </tr>
-    </thead>
-    <tbody>
-        {% for word in filtered_word_list %}
-            <tr>
-                {% for column in word %}
-                    {% if loop.index0 != csv_header.index('id') %}  <!-- Exclude the 'id' column -->
-                        <td>{{ column }}</td>
-                    {% endif %}
-                {% endfor %}
-                <td>
-                    <button class="btn btn-info" onclick="showWordDetails('{{ word[0] }}', '{{ word[1] }}', '{{ word[2] }}', '{{ word[3] }}', '{{ word[4] }}', '{{ word[5] }}')">Details</button>
-                </td>
-            </tr>
-        {% endfor %}
-    </tbody>
-</table>
-</div>
+    {% include 'dictionary_table.html' %}
 
-<!-- Modal for Word Details -->
-<div class="modal fade" id="wordDetailsModal" tabindex="-1" aria-labelledby="wordDetailsModalLabel" aria-hidden="true">
-    <div class="modal-dialog">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h5 class="modal-title" id="wordDetailsModalLabel">Word Details</h5>
-                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close">Close</button>
-            </div>
-            <div class="modal-body">
-                <!-- Word details will be displayed here -->
-                <p id="wordDetails"></p>
-            </div>
-            <div class="modal-footer">
-                <button type="button" class="btn btn-success" onclick="acceptChanges()">Accept</button>
-                <button type="button" class="btn btn-danger" onclick="removeWord()" data-bs-dismiss="modal">Remove</button>
+    <!-- Modal for Word Details -->
+    <div class="modal fade" id="wordDetailsModal" tabindex="-1" aria-labelledby="wordDetailsModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="wordDetailsModalLabel">Word Details</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close">Close</button>
+                </div>
+                <div class="modal-body">
+                    <!-- Word details will be displayed here -->
+                    <p id="wordDetails"></p>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-success" onclick="acceptChanges()">Accept</button>
+                    <button type="button" class="btn btn-danger" onclick="removeWord()" data-bs-dismiss="modal">Remove</button>
+                </div>
             </div>
         </div>
     </div>
-</div>
 
 </div>
 
