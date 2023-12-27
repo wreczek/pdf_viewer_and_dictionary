@@ -6,8 +6,8 @@ from flask import Flask, render_template, send_from_directory, url_for, request,
     redirect, jsonify
 
 from config import load_config
-from utils import get_status, get_upload_date, get_access_date, get_available_files, apply_filters, \
-    sort_records
+from utils import get_status, get_upload_date, get_access_date, get_available_files, \
+    apply_filters, sort_records
 
 app = Flask(__name__)
 
@@ -53,7 +53,7 @@ def pdf_viewer_home():
 
 @app.route('/unfamiliar_words', methods=['GET', 'POST'])
 def unfamiliar_words():
-    with open(DB_PATH, 'r', encoding='utf-8') as f:
+    with open(DB_PATH, encoding='utf-8') as f:
         reader = csv.reader(f)
         csv_header, *word_list = list(reader)
 
@@ -116,16 +116,16 @@ def upload_file():
                            active_page='upload_file')
 
 
-@app.route('/delete_word/<wordId>', methods=['DELETE'])
-def delete_word(wordId):
-    print(f"Received DELETE request for word ID: {wordId}")
-    wordId = int(wordId)
+@app.route('/delete_word/<word_id>', methods=['DELETE'])
+def delete_word(word_id):
+    print(f"Received DELETE request for word ID: {word_id}")
+    word_id = int(word_id)
 
     db_csv = pd.read_csv(DB_PATH)
-    db_csv = db_csv.drop(db_csv[db_csv.id == wordId].index)
+    db_csv = db_csv.drop(db_csv[db_csv.id == word_id].index)
     db_csv.to_csv(DB_PATH, index=False)
 
-    return jsonify({'message': 'Word deleted successfully', 'wordId': wordId})
+    return jsonify({'message': 'Word deleted successfully', 'word_id': word_id})
 
 
 @app.route('/get_updated_content')
@@ -140,7 +140,7 @@ def get_updated_content():
 # This function should return the HTML content you want to update
 def fetch_updated_content():
     # Similar to the logic in your 'unfamiliar_words' route
-    with open(DB_PATH, 'r', encoding='utf-8') as f:
+    with open(DB_PATH, encoding='utf-8') as f:
         reader = csv.reader(f)
         csv_header, *word_list = list(reader)
 
