@@ -1,6 +1,7 @@
 import os
 import csv
 
+import pandas as pd
 from flask import Flask, render_template, send_from_directory, send_file, url_for, request, \
     redirect, jsonify
 
@@ -113,6 +114,10 @@ def upload_file():
 @app.route('/delete_word/<wordId>', methods=['DELETE'])
 def delete_word(wordId):
     print(f"Received DELETE request for word ID: {wordId}")
-    # Your logic to delete the word with the given ID
-    # ...
+    wordId = int(wordId)
+
+    db_csv = pd.read_csv(DB_PATH)
+    db_csv = db_csv.drop(db_csv[db_csv.id == wordId].index)
+    db_csv.to_csv(DB_PATH, index=False)
+
     return jsonify({'message': 'Word deleted successfully', 'wordId': wordId})
