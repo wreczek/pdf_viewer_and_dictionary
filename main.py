@@ -8,15 +8,31 @@ from flask import Flask, render_template, send_from_directory, url_for, request,
 from config import load_config
 from utils import get_status, get_upload_date, get_access_date, get_available_files, \
     apply_filters, sort_records
+from flask_sqlalchemy import SQLAlchemy
+from flask_migrate import Migrate
+from flask import Flask, render_template, redirect, url_for, flash
+from flask_login import LoginManager, UserMixin, login_user, login_required, logout_user, current_user
+from flask_wtf import FlaskForm
+from wtforms import StringField, PasswordField, SubmitField
+from wtforms.validators import DataRequired, EqualTo
+from werkzeug.security import generate_password_hash, check_password_hash
 
 app = Flask(__name__)
 
 config = load_config()
 
 UPLOAD_FOLDER = config.upload_folder
-DB_PATH = config.db_path
+WORDS_CSV_PATH = config.words_csv_path
 
+app.config['SECRET_KEY'] = 'your_secret_key'  # Change this to a secure secret key
+app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///site.db'  # Use SQLite for simplicity
 app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
+
+login_manager = LoginManager(app)
+login_manager.login_view = 'login'
+
+db = SQLAlchemy(app)
+migrate = Migrate(app, db)
 
 
 @app.route('/')
@@ -53,7 +69,7 @@ def pdf_viewer_home():
 
 @app.route('/unfamiliar_words', methods=['GET', 'POST'])
 def unfamiliar_words():
-    with open(DB_PATH, encoding='utf-8') as f:
+    with open(WORDS_CSV_PATH, encoding='utf-8') as f:
         reader = csv.reader(f)
         csv_header, *word_list = list(reader)
 
@@ -121,9 +137,9 @@ def delete_word(word_id):
     print(f"Received DELETE request for word ID: {word_id}")
     word_id = int(word_id)
 
-    db_csv = pd.read_csv(DB_PATH)
+    db_csv = pd.read_csv(WORDS_CSV_PATH)
     db_csv = db_csv.drop(db_csv[db_csv.id == word_id].index)
-    db_csv.to_csv(DB_PATH, index=False)
+    db_csv.to_csv(WORDS_CSV_PATH, index=False)
 
     return jsonify({'message': 'Word deleted successfully', 'word_id': word_id})
 
@@ -140,7 +156,7 @@ def get_updated_content():
 # This function should return the HTML content you want to update
 def fetch_updated_content():
     # Similar to the logic in your 'unfamiliar_words' route
-    with open(DB_PATH, encoding='utf-8') as f:
+    with open(WORDS_CSV_PATH, encoding='utf-8') as f:
         reader = csv.reader(f)
         csv_header, *word_list = list(reader)
 
@@ -163,3 +179,94 @@ def fetch_updated_content():
                                       active_page='unfamiliar_words')
 
     return updated_content
+
+###################################################################################################################################################
+### logowanie
+###################################################################################################################################################
+
+
+class RegistrationForm(FlaskForm):
+    username = StringField('Username', validators=[DataRequired()])
+    password = PasswordField('Password', validators=[DataRequired()])
+    confirm_password = PasswordField('Confirm Password',
+                                     validators=[DataRequired(), EqualTo('password')])
+    submit = SubmitField('Register')
+
+
+class User(db.Model, UserMixin):
+    id = db.Column(db.Integer, primary_key=True)
+    username = db.Column(db.String(50), unique=True, nullable=False)
+    password = db.Column(db.String(200), nullable=False)
+    # Add your other user model fields here
+
+    def __init__(self, username, password):
+        self.username = username
+        self.password = password
+
+    def get_id(self):
+        return str(self.id)
+
+
+@login_manager.user_loader
+def load_user(user_id):
+    print(f'Loading user with ID: {user_id}')
+    return User.query.get(int(user_id))
+
+
+class LoginForm(FlaskForm):
+    username = StringField('Username', validators=[DataRequired()])
+    password = PasswordField('Password', validators=[DataRequired()])
+    submit = SubmitField('Login')
+
+
+@app.route('/login', methods=['GET', 'POST'])
+def login():
+    form = LoginForm()
+
+    if form.validate_on_submit():
+        # Assuming you have access to the user's information from the form
+        username = form.username.data
+        # email = form.email.data
+        password = form.password.data
+
+        # Query the database for the user
+        user = User.query.filter_by(username=username).first()
+
+        if user and check_password_hash(user.password, password):
+            login_user(user)
+            print(f'User ID after login: {user.id}')
+            flash('Login successful!', 'success')
+            return redirect(url_for('dashboard'))
+        else:
+            flash('Invalid username or password', 'danger')
+
+    return render_template('login.html', form=form)
+
+
+@app.route('/register', methods=['GET', 'POST'])
+def register():
+    form = RegistrationForm()
+
+    if form.validate_on_submit():
+        hashed_password = generate_password_hash(form.password.data)
+        new_user = User(username=form.username.data, password=hashed_password)
+        db.session.add(new_user)
+        db.session.commit()
+        flash('Account created successfully! You can now log in.', 'success')
+        return redirect(url_for('login'))
+
+    return render_template('register.html', form=form)
+
+
+@app.route('/logout')
+@login_required
+def logout():
+    logout_user()
+    flash('Logout successful!', 'success')
+    return redirect(url_for('login'))
+
+
+@app.route('/dashboard')
+@login_required
+def dashboard():
+    return f'Hello, {current_user.id}! This is your dashboard.'
