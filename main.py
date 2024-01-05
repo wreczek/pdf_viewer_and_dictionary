@@ -1,31 +1,31 @@
 import os
 import csv
 
+from flask import (flash, Flask, jsonify, redirect, request, render_template, send_from_directory,
+                   url_for)
+from flask_login import (current_user, login_required, login_user, logout_user, LoginManager,
+                         UserMixin)
+from flask_migrate import Migrate
+from flask_sqlalchemy import SQLAlchemy
+
+from flask_wtf import FlaskForm
 import pandas as pd
-from flask import Flask, render_template, send_from_directory, url_for, request, \
-    redirect, jsonify
+from wtforms import PasswordField, StringField, SubmitField
+from wtforms.validators import DataRequired, EqualTo
+from werkzeug.security import check_password_hash, generate_password_hash
 
 from config import load_config
-from utils import get_status, get_upload_date, get_access_date, get_available_files, \
-    apply_filters, sort_records
-from flask_sqlalchemy import SQLAlchemy
-from flask_migrate import Migrate
-from flask import Flask, render_template, redirect, url_for, flash
-from flask_login import LoginManager, UserMixin, login_user, login_required, logout_user, current_user
-from flask_wtf import FlaskForm
-from wtforms import StringField, PasswordField, SubmitField
-from wtforms.validators import DataRequired, EqualTo
-from werkzeug.security import generate_password_hash, check_password_hash
+from utils import (apply_filters, get_access_date, get_available_files, get_status, get_upload_date,
+                   sort_records)
 
 app = Flask(__name__)
-
 config = load_config()
 
 UPLOAD_FOLDER = config.upload_folder
 WORDS_CSV_PATH = config.words_csv_path
 
-app.config['SECRET_KEY'] = 'your_secret_key'  # Change this to a secure secret key
-app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///site.db'  # Use SQLite for simplicity
+app.config['SECRET_KEY'] = 'your_secret_key'  # TODO: Change this to a secure secret key
+app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///site.db'
 app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
 
 login_manager = LoginManager(app)
@@ -35,19 +35,49 @@ db = SQLAlchemy(app)
 migrate = Migrate(app, db)
 
 
+class RegistrationForm(FlaskForm):
+    username = StringField('Username', validators=[DataRequired()])
+    password = PasswordField('Password', validators=[DataRequired()])
+    confirm_password = PasswordField('Confirm Password',
+                                     validators=[DataRequired(), EqualTo('password')])
+    submit = SubmitField('Register')
+
+
+class User(db.Model, UserMixin):
+    id = db.Column(db.Integer, primary_key=True)
+    username = db.Column(db.String(50), unique=True, nullable=False)
+    password = db.Column(db.String(200), nullable=False)
+
+    def __init__(self, username, password):
+        self.username = username
+        self.password = password
+
+    def get_id(self):
+        return str(self.id)
+
+
+@login_manager.user_loader
+def load_user(user_id):
+    print(f'Loading user with ID: {user_id}')
+    return User.query.get(int(user_id))
+
+
+class LoginForm(FlaskForm):
+    username = StringField('Username', validators=[DataRequired()])
+    password = PasswordField('Password', validators=[DataRequired()])
+    submit = SubmitField('Login')
+
+
 @app.route('/')
 def index():
-    return render_template("home.html",
-                           active_page='index')
+    return render_template("home.html", active_page='index')
 
 
 @app.route('/pdf_viewer')
 def pdf_viewer_home():
-    pdf_files = get_available_files()
-
     pdf_files_info = []
 
-    for pdf_file in pdf_files:
+    for pdf_file in get_available_files():
         file_path = os.path.join(app.config['UPLOAD_FOLDER'], pdf_file)
         status = get_status(file_path)
         upload_date = get_upload_date(file_path)
@@ -70,8 +100,7 @@ def pdf_viewer_home():
 @app.route('/unfamiliar_words', methods=['GET', 'POST'])
 def unfamiliar_words():
     with open(WORDS_CSV_PATH, encoding='utf-8') as f:
-        reader = csv.reader(f)
-        csv_header, *word_list = list(reader)
+        csv_header, *word_list = list(csv.reader(f))
 
     selected_file = request.form.get('file', '')
     selected_date = request.form.get('date', '')
@@ -81,7 +110,6 @@ def unfamiliar_words():
 
     filtered_word_list = apply_filters(word_list, selected_file, selected_date, selected_difficulty)
     filtered_and_sorted_word_list = sort_records(sort_by, is_reversed, filtered_word_list)
-
     available_files = get_available_files()
 
     return render_template('dictionary.html',
@@ -93,8 +121,7 @@ def unfamiliar_words():
 
 @app.route('/pdf/<path:filename>')
 def pdf(filename):
-    directory = os.path.join(app.root_path, 'documents')
-    return send_from_directory(directory, filename)
+    return send_from_directory(os.path.join(app.root_path, 'documents'), filename)
 
 
 @app.route('/pdf_viewer/<path:filename>')
@@ -114,22 +141,13 @@ def pdf_viewer(filename):
 
 @app.route('/upload', methods=['GET', 'POST'])
 def upload_file():
-    if request.method == 'POST':
-        if 'file' not in request.files:
-            return redirect(request.url)
-
+    if request.method == 'POST' and 'file' in request.files:
         file = request.files['file']
-
-        if file.filename == '':
-            return redirect(request.url)
-
-        if file:
+        if file.filename != '':
             filename = os.path.join(app.config['UPLOAD_FOLDER'], file.filename)
             file.save(filename)
-            return redirect(url_for('index'))
-
-    return render_template('upload.html',
-                           active_page='upload_file')
+            return redirect(url_for('pdf_viewer_home'))
+    return render_template('upload.html', active_page='upload_file')
 
 
 @app.route('/delete_word/<word_id>', methods=['DELETE'])
@@ -146,19 +164,13 @@ def delete_word(word_id):
 
 @app.route('/get_updated_content')
 def get_updated_content():
-    # Fetch and serialize the updated content as JSON
     updated_content = fetch_updated_content()
-
-    # Assuming fetch_updated_content returns a dictionary with an 'html' key
     return jsonify({'html': updated_content})
 
 
-# This function should return the HTML content you want to update
 def fetch_updated_content():
-    # Similar to the logic in your 'unfamiliar_words' route
     with open(WORDS_CSV_PATH, encoding='utf-8') as f:
-        reader = csv.reader(f)
-        csv_header, *word_list = list(reader)
+        csv_header, *word_list = list(csv.reader(f))
 
     selected_file = request.form.get('file', '')
     selected_date = request.form.get('date', '')
@@ -168,10 +180,8 @@ def fetch_updated_content():
 
     filtered_word_list = apply_filters(word_list, selected_file, selected_date, selected_difficulty)
     filtered_and_sorted_word_list = sort_records(sort_by, is_reversed, filtered_word_list)
-
     available_files = get_available_files()
 
-    # Render the template and return the HTML content
     updated_content = render_template('dictionary_table.html',
                                       filtered_word_list=filtered_and_sorted_word_list,
                                       available_files=available_files,
@@ -180,56 +190,15 @@ def fetch_updated_content():
 
     return updated_content
 
-###################################################################################################################################################
-### logowanie
-###################################################################################################################################################
-
-
-class RegistrationForm(FlaskForm):
-    username = StringField('Username', validators=[DataRequired()])
-    password = PasswordField('Password', validators=[DataRequired()])
-    confirm_password = PasswordField('Confirm Password',
-                                     validators=[DataRequired(), EqualTo('password')])
-    submit = SubmitField('Register')
-
-
-class User(db.Model, UserMixin):
-    id = db.Column(db.Integer, primary_key=True)
-    username = db.Column(db.String(50), unique=True, nullable=False)
-    password = db.Column(db.String(200), nullable=False)
-    # Add your other user model fields here
-
-    def __init__(self, username, password):
-        self.username = username
-        self.password = password
-
-    def get_id(self):
-        return str(self.id)
-
-
-@login_manager.user_loader
-def load_user(user_id):
-    print(f'Loading user with ID: {user_id}')
-    return User.query.get(int(user_id))
-
-
-class LoginForm(FlaskForm):
-    username = StringField('Username', validators=[DataRequired()])
-    password = PasswordField('Password', validators=[DataRequired()])
-    submit = SubmitField('Login')
-
 
 @app.route('/login', methods=['GET', 'POST'])
 def login():
     form = LoginForm()
 
     if form.validate_on_submit():
-        # Assuming you have access to the user's information from the form
         username = form.username.data
-        # email = form.email.data
         password = form.password.data
 
-        # Query the database for the user
         user = User.query.filter_by(username=username).first()
 
         if user and check_password_hash(user.password, password):
@@ -271,3 +240,11 @@ def logout():
 def dashboard():
     return render_template('dashboard.html',
                            current_user_id=current_user.id)
+
+
+if __name__ == "__main__":
+    app.run(debug=True)
+
+#  TODO: 1. upload date to inna data (wydaje sie ze access date przy uploadzie jest ok)
+#   2. po uploadzie powinno albo pozostac na tej samej stronie albo przejsc to listy plikow
+#   3. login/logout/profil w bar.html
