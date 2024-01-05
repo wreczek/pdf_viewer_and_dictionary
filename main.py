@@ -248,5 +248,5 @@ if __name__ == "__main__":
     app.run(debug=True)
 
 #  TODO: 1. upload date to inna data (wydaje sie ze access date przy uploadzie jest ok)
-#   2. po uploadzie powinno albo pozostac na tej samej stronie albo przejsc to listy plikow
-#   3. login/logout/profil w bar.html
+#   2. login/logout/profil w bar.html
+#   3. pdf_viewer_home zmienic nazwe np. file_list

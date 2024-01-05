@@ -1,22 +1,35 @@
-<html>
+<!DOCTYPE html>
+<html lang="en">
 
 <head>
-  <title>{% block title %}{% endblock %}</title>
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css"
-    crossorigin="anonymous" />
-  <link rel="stylesheet" href="{{ url_for('static', filename='css/styles.css') }}">
+    <title>{% block title %}{% endblock %}</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css"
+        crossorigin="anonymous" />
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/styles.css') }}">
 
     <!-- Bootstrap CSS -->
-    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm" crossorigin="anonymous">
+    <link rel="stylesheet"
+        href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css"
+        integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm"
+        crossorigin="anonymous">
 
     <!-- jQuery -->
-    <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js" integrity="sha384-DfXdz2htPH0lsSSs5nCTpuj/zy4C+OGpamoFVy38MVBnE+IbbVYUew+OrCXaRkfj" crossorigin="anonymous"></script>
+    <script
+        src="https://code.jquery.com/jquery-3.5.1.slim.min.js"
+        integrity="sha384-DfXdz2htPH0lsSSs5nCTpuj/zy4C+OGpamoFVy38MVBnE+IbbVYUew+OrCXaRkfj"
+        crossorigin="anonymous"></script>
 
     <!-- Popper.js -->
-    <script src="https://cdn.jsdelivr.net/npm/popper.js@2.11.6/dist/umd/popper.min.js" integrity="sha384-B4gt1jrGC7Jh4AgTPSdUtOBvfO8sh+Wy6XMlZv5v+U8d6Ajh4u69tWE2JbI5uRTS" crossorigin="anonymous"></script>
+    <script
+        src="https://cdn.jsdelivr.net/npm/popper.js@2.11.6/dist/umd/popper.min.js"
+        integrity="sha384-B4gt1jrGC7Jh4AgTPSdUtOBvfO8sh+Wy6XMlZv5v+U8d6Ajh4u69tWE2JbI5uRTS"
+        crossorigin="anonymous"></script>
 
     <!-- Bootstrap JavaScript -->
-    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js" integrity="sha384-B4gt1jrGC7Jh4AgTPSdUtOBvfO8sh+Wy6XMlZv5v+U8d6Ajh4u69tWE2JbI5uRTS" crossorigin="anonymous"></script>
+    <script
+        src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"
+        integrity="sha384-B4gt1jrGC7Jh4AgTPSdUtOBvfO8sh+Wy6XMlZv5v+U8d6Ajh4u69tWE2JbI5uRTS"
+        crossorigin="anonymous"></script>
 
     <!-- Add this before your closing </head> tag 27.12.23-->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
@@ -25,40 +38,56 @@
 </head>
 
 <body>
-  <div class="nav-bar">
-    <div>
-      <a href="{{ url_for('pdf_viewer_home') }}" {% if active_page == 'pdf_viewer_home' %}class="active"{% endif %}>Files</a>
-    </div>
+    <div class="nav-bar">
+        <div>
+            <a href="{{ url_for('pdf_viewer_home') }}" {% if active_page == 'pdf_viewer_home' %}class="active"{% endif %}>Files</a>
+        </div>
 
-    <div>
-      <a href="#" {% if active_page == 'pdf_viewer' %}class="active"{% endif %}>
-        {% if current_file %}
-          {{ current_file }}
+        <div>
+            <a href="#" {% if active_page == 'pdf_viewer' %}class="active"{% endif %}>
+                {% if current_file %}
+                    {{ current_file }}
+                {% else %}
+                    Current file
+                {% endif %}
+            </a>
+        </div>
+
+        <div>
+            <a href="{{ url_for('unfamiliar_words') }}" {% if active_page == 'unfamiliar_words' %}class="active"{% endif %}>Dictionary</a>
+        </div>
+
+        {% if current_user.is_authenticated %}
+            <!-- User is logged in -->
+            <div>
+                <a href="{{ url_for('logout') }}" class="logout">Logout</a>
+            </div>
+            <div>
+                <a href="{{ url_for('dashboard') }}" {% if active_page == 'dashboard' %}class="active"{% endif %}>Profile</a>
+            </div>
         {% else %}
-          Current file
+            <!-- User is not logged in -->
+            <div>
+                <a href="{{ url_for('login') }}" {% if active_page == 'login' %}class="active"{% endif %}>Login</a>
+            </div>
+            <div>
+                <a href="{{ url_for('register') }}" {% if active_page == 'register' %}class="active"{% endif %}>Register</a>
+            </div>
         {% endif %}
-      </a>
+
+        <div class="upload-icon" onclick="document.getElementById('file-input').click();">
+            <i class="fas fa-upload"></i>
+            <form id="upload-form" method="POST" action="{{ url_for('upload_file') }}" enctype="multipart/form-data" style="display: none;">
+                <input type="file" name="file" id="file-input" onchange="document.getElementById('upload-form').submit();">
+            </form>
+        </div>
+
+        <div class="home-icon" onclick="window.location.href='{{ url_for('index') }}';">
+            <i class="fas fa-home"></i>
+        </div>
     </div>
 
-    <div>
-      <a href="{{ url_for('unfamiliar_words') }}" {% if active_page == 'unfamiliar_words' %}class="active"{% endif %}>Dictionary</a>
-    </div>
-
-
-    <div class="upload-icon" onclick="document.getElementById('file-input').click();">
-      <i class="fas fa-upload"></i>
-      <form id="upload-form" method="POST" action="{{ url_for('upload_file') }}" enctype="multipart/form-data" style="display: none;">
-        <input type="file" name="file" id="file-input" onchange="document.getElementById('upload-form').submit();">
-      </form>
-    </div>
-
-    <div class="home-icon" onclick="window.location.href='{{ url_for('index') }}';">
-      <i class="fas fa-home"></i>
-    </div>
-
-  </div>
-
-  {% block content %}{% endblock %}
+    {% block content %}{% endblock %}
 </body>
 
 </html>
