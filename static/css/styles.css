@@ -53,38 +53,62 @@ body {
     background-color: #D6EEEE;
 }
 
-.upload-icon:hover {
+.upload-icon:hover,
+.profile-icon:hover,
+.logout-icon:hover,
+.login-icon:hover,
+.register-icon:hover {
     background-color: #007bff;
 }
 
-.upload-icon i {
+.upload-icon i,
+.profile-icon i,
+.logout-icon i,
+.login-icon i,
+.register-icon i {
     font-size: 37px;
-    color: black; /* Set the initial color of the icon */
+    color: black;
 }
 
-.upload-icon {
+.upload-icon,
+.profile-icon,
+.logout-icon,
+.login-icon,
+.register-icon {
     margin-left: auto;
-    padding: 10px; /* Add padding for better visual appearance */
+    padding: 10px;
 }
 
 .nav-bar a.active {
-    border: 3px solid red; /* Add your preferred border style here */
+    border: 3px solid red;
 }
 
-.home-icon {
+.home-icon,
+.profile-icon,
+.logout-icon,
+.login-icon,
+.register-icon {
     cursor: pointer;
-    margin-left: 10px; /* Add margin for spacing between icons */
+    margin-left: 10px;
     display: flex;
     align-items: center;
-    padding: 10px; /* Add padding for better visual appearance */
+    padding: 10px;
 }
 
-.home-icon:hover {
+.home-icon:hover,
+.profile-icon:hover,
+.logout-icon:hover,
+.login-icon:hover,
+.register-icon:hover {
     background-color: #007bff;
 }
 
-.home-icon i {
+.home-icon i,
+.profile-icon i,
+.logout-icon i,
+.login-icon i,
+.register-icon i {
     font-size: 37px;
-    color: black; /* Set the initial color of the icon */
-    margin-right: 5px; /* Adjust as needed for spacing between icon and text */
+    color: black;
+    margin-right: 5px;
 }

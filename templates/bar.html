@@ -59,19 +59,19 @@
 
         {% if current_user.is_authenticated %}
             <!-- User is logged in -->
-            <div>
-                <a href="{{ url_for('logout') }}" class="logout">Logout</a>
+            <div class="profile-icon" onclick="window.location.href='{{ url_for('dashboard') }}';">
+                <i class="fas fa-user"></i>
             </div>
-            <div>
-                <a href="{{ url_for('dashboard') }}" {% if active_page == 'dashboard' %}class="active"{% endif %}>Profile</a>
+            <div class="logout-icon" onclick="window.location.href='{{ url_for('logout') }}';">
+                <i class="fas fa-sign-out-alt"></i>
             </div>
         {% else %}
             <!-- User is not logged in -->
-            <div>
-                <a href="{{ url_for('login') }}" {% if active_page == 'login' %}class="active"{% endif %}>Login</a>
+            <div class="login-icon" onclick="window.location.href='{{ url_for('login') }}';">
+                <i class="fas fa-sign-in-alt"></i>
             </div>
-            <div>
-                <a href="{{ url_for('register') }}" {% if active_page == 'register' %}class="active"{% endif %}>Register</a>
+            <div class="register-icon" onclick="window.location.href='{{ url_for('register') }}';">
+                <i class="fas fa-user-plus"></i>
             </div>
         {% endif %}
 
