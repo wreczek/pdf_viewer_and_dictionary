@@ -1,13 +1,14 @@
 import os
 import csv
 
-from flask import (flash, Flask, jsonify, redirect, request, render_template, send_from_directory,
-                   url_for)
-from flask_login import (current_user, login_required, login_user, logout_user, LoginManager,
-                         UserMixin)
+from flask import (
+    flash, Flask, jsonify, redirect, request, render_template, send_from_directory, url_for
+)
+from flask_login import (
+    current_user, login_required, login_user, logout_user, LoginManager, UserMixin
+)
 from flask_migrate import Migrate
 from flask_sqlalchemy import SQLAlchemy
-
 from flask_wtf import FlaskForm
 import pandas as pd
 from wtforms import PasswordField, StringField, SubmitField
@@ -15,8 +16,9 @@ from wtforms.validators import DataRequired, EqualTo
 from werkzeug.security import check_password_hash, generate_password_hash
 
 from config import load_config
-from utils import (apply_filters, get_access_date, get_available_files, get_status, get_upload_date,
-                   sort_records)
+from utils import (
+    apply_filters, get_access_date, get_available_files, get_status, get_upload_date, sort_records
+)
 
 app = Flask(__name__)
 config = load_config()
