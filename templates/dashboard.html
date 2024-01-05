@@ -1,10 +1,10 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <title>Title</title>
-</head>
-<body>
+<!-- dashboard.html -->
+{% extends 'bar.html' %}
 
-</body>
-</html>
+{% block title %}
+    Dashboard
+{% endblock %}
+
+{% block content %}
+    <p>Hello, {{ current_user_id }}! This is your dashboard.</p>
+{% endblock %}

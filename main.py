@@ -269,4 +269,5 @@ def logout():
 @app.route('/dashboard')
 @login_required
 def dashboard():
-    return f'Hello, {current_user.id}! This is your dashboard.'
+    return render_template('dashboard.html',
+                           current_user_id=current_user.id)

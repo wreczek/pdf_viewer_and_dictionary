@@ -1,12 +1,19 @@
 <!-- login.html -->
-<!DOCTYPE html>
-<html lang="en">
-<head>
+{% extends 'bar.html' %}
+
+{% block title %}
+    Login
+{% endblock %}
+
+{% block head %}
+    {{ super() }}
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Login</title>
-</head>
-<body>
+    <meta name="description" content="Your login page description here">
+    <!-- Add any other meta tags you need -->
+{% endblock %}
+
+{% block content %}
     <h1>Login</h1>
     {% with messages = get_flashed_messages() %}
         {% if messages %}
@@ -23,5 +30,4 @@
         {{ form.password.label }} {{ form.password }}
         {{ form.submit }}
     </form>
-</body>
-</html>
+{% endblock %}
