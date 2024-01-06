@@ -11,9 +11,9 @@ function showWordDetails(word, translation, book, date, difficulty, wordId) {
     // Set the wordId as a data attribute on the modal
     document.getElementById('wordDetailsModal').setAttribute('data-word-id', wordId);
 
-    // Show the modal
-    var wordDetailsModal = new bootstrap.Modal(document.getElementById('wordDetailsModal'));
-    wordDetailsModal.show();
+    // Show the modal using Bootstrap's method
+    $('#wordDetailsModal').modal('show');
+
 }
 
 function acceptChanges() {
@@ -22,9 +22,9 @@ function acceptChanges() {
     // After accepting changes, you may want to refresh the page or update the table dynamically
     // ...
 
-    // Close the modal
-    var wordDetailsModal = new bootstrap.Modal(document.getElementById('wordDetailsModal'));
-    wordDetailsModal.hide();
+    // Close the modal using Bootstrap's method
+    $('#wordDetailsModal').modal('hide');
+
 }
 
 function removeWord() {
@@ -59,9 +59,8 @@ function removeWord() {
     // Ensure data is defined before logging
     console.log('Word removed successfully:', data);
 
-    // Close the modal
-    var wordDetailsModal = new bootstrap.Modal(document.getElementById('wordDetailsModal'));
-    wordDetailsModal.hide();
+    // Close the modal using Bootstrap's method
+    $('#wordDetailsModal').modal('hide');
 
     // Fetch and refresh content after removal
     fetchAndRefreshContent();

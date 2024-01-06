@@ -249,5 +249,5 @@ if __name__ == "__main__":
 
 #  TODO: 1. upload date to inna data (wydaje sie ze access date przy uploadzie jest ok)
 #   2. login/logout/profil w bar.html
-#   3. pdf_viewer_home zmienic nazwe np. file_list
-#   4. dodac cos w stylu archiwum? tam trafiaja usuniete slowa, a z archiwum mozna je juz usunac na zawsze
+#   3. dodac cos w stylu archiwum? tam trafiaja usuniete slowa, a z archiwum mozna je juz usunac na zawsze
+#   4. naprawić details przycisk
