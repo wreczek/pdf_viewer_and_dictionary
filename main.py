@@ -102,8 +102,8 @@ def pdf(filename):
     return send_from_directory(os.path.join(app.root_path, 'documents'), filename)
 
 
-@app.route('/pdf_viewer')
-def pdf_viewer_home():
+@app.route('/file_list')
+def file_list():
     pdf_files_info = []
 
     for pdf_file in get_available_files():
@@ -121,12 +121,12 @@ def pdf_viewer_home():
 
     pdf_files_info.sort(key=lambda x: x['access_date'], reverse=True)
 
-    return render_template('file_list_table.html',
+    return render_template('file_list.html',
                            pdf_files_info=pdf_files_info,
-                           active_page='pdf_viewer_home')
+                           active_page='file_list')
 
 
-@app.route('/pdf_viewer/<path:filename>')
+@app.route('/file_list/<path:filename>')
 def pdf_viewer(filename):
     pdf_path = url_for('pdf', filename=filename)
 
@@ -148,7 +148,7 @@ def upload_file():
         if file.filename != '':
             filename = os.path.join(app.config['UPLOAD_FOLDER'], file.filename)
             file.save(filename)
-            return redirect(url_for('pdf_viewer_home'))
+            return redirect(url_for('file_list'))
     return render_template('upload.html', active_page='upload_file')
 
 
@@ -250,3 +250,4 @@ if __name__ == "__main__":
 #  TODO: 1. upload date to inna data (wydaje sie ze access date przy uploadzie jest ok)
 #   2. login/logout/profil w bar.html
 #   3. pdf_viewer_home zmienic nazwe np. file_list
+#   4. dodac cos w stylu archiwum? tam trafiaja usuniete slowa, a z archiwum mozna je juz usunac na zawsze
