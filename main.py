@@ -75,30 +75,6 @@ def index():
     return render_template("home.html", active_page='index')
 
 
-@app.route('/pdf_viewer')
-def pdf_viewer_home():
-    pdf_files_info = []
-
-    for pdf_file in get_available_files():
-        file_path = os.path.join(app.config['UPLOAD_FOLDER'], pdf_file)
-        status = get_status(file_path)
-        upload_date = get_upload_date(file_path)
-        access_date = get_access_date(file_path)
-
-        pdf_files_info.append({
-            'name': pdf_file,
-            'upload_date': upload_date,
-            'access_date': access_date,
-            'status': status
-        })
-
-    pdf_files_info.sort(key=lambda x: x['access_date'], reverse=True)
-
-    return render_template('file_list.html',
-                           pdf_files_info=pdf_files_info,
-                           active_page='pdf_viewer_home')
-
-
 @app.route('/unfamiliar_words', methods=['GET', 'POST'])
 def unfamiliar_words():
     with open(WORDS_CSV_PATH, encoding='utf-8') as f:
@@ -124,6 +100,30 @@ def unfamiliar_words():
 @app.route('/pdf/<path:filename>')
 def pdf(filename):
     return send_from_directory(os.path.join(app.root_path, 'documents'), filename)
+
+
+@app.route('/pdf_viewer')
+def pdf_viewer_home():
+    pdf_files_info = []
+
+    for pdf_file in get_available_files():
+        file_path = os.path.join(app.config['UPLOAD_FOLDER'], pdf_file)
+        status = get_status(file_path)
+        upload_date = get_upload_date(file_path)
+        access_date = get_access_date(file_path)
+
+        pdf_files_info.append({
+            'name': pdf_file,
+            'upload_date': upload_date,
+            'access_date': access_date,
+            'status': status
+        })
+
+    pdf_files_info.sort(key=lambda x: x['access_date'], reverse=True)
+
+    return render_template('file_list_table.html',
+                           pdf_files_info=pdf_files_info,
+                           active_page='pdf_viewer_home')
 
 
 @app.route('/pdf_viewer/<path:filename>')
