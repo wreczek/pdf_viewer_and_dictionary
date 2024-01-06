@@ -251,3 +251,5 @@ if __name__ == "__main__":
 #   2. login/logout/profil w bar.html
 #   3. dodac cos w stylu archiwum? tam trafiaja usuniete slowa, a z archiwum mozna je juz usunac na zawsze
 #   4. naprawić details przycisk
+#   5. naprawic dashboard (po kliknieciu przenosi do dashboardu a pozniej przy logout jest wiadomosc o login)
+#   6. być może apply filter nie powinien odświeżać całej strony tylko samą tabelkę?
