@@ -10,7 +10,7 @@
     <h1 class="mb-4">List of Unfamiliar Words</h1>
 
     <!-- Filter Form -->
-    <form method="post" action="{{ url_for('unfamiliar_words') }}" class="filter-form">
+    <form method="post" action="{{ url_for('unfamiliar_words') }}" class="filter-form" id="filterForm">
         <div class="row">
             <div class="col-md-3 mb-3">
                 <label for="file" class="form-label">Filter by File:</label>
@@ -86,5 +86,29 @@
 </div>
 
 <script src="{{ url_for('static', filename='js/scripts.js') }}"></script>
+<script>
+    $(document).ready(function () {
+        $('#filterForm').submit(function (event) {
+            event.preventDefault();  // Prevent the default form submission
+
+            // Serialize form data
+            var formData = $(this).serialize();
+
+            // Send an AJAX request
+            $.ajax({
+                type: 'POST',
+                url: "{{ url_for('unfamiliar_words') }}",
+                data: formData,
+                success: function (data) {
+                    // Update the table content with the response
+                    $('#tableContainer').html(data);
+                },
+                error: function () {
+                    console.error('Error occurred during AJAX request');
+                }
+            });
+        });
+    });
+</script>
 
 {% endblock %}

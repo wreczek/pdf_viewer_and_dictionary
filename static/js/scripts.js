@@ -108,3 +108,29 @@ function setLastPosition(lastPosition, currentFile) {
 
 // Use the function to set the last position when the page loads
 setLastPosition("{{ last_position }}", "{{ current_file }}");
+
+$(document).ready(function () {
+    $('#filterForm').submit(function (event) {
+        event.preventDefault();  // Prevent the default form submission
+
+        // Serialize form data
+        var formData = $(this).serialize();
+
+        // Send an AJAX request
+        $.ajax({
+            type: 'POST',
+            url: "{{ url_for('unfamiliar_words_partial') }}",
+            data: formData,
+            success: function (data) {
+                // Update the table content with the response
+                $('#refreshedContent').html(data);
+
+                // After updating the content, fetch and refresh additional content
+                fetchAndRefreshContent();
+            },
+            error: function () {
+                console.error('Error occurred during AJAX request');
+            }
+        });
+    });
+});

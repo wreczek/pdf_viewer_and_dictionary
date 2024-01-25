@@ -97,6 +97,24 @@ def unfamiliar_words():
                            active_page='unfamiliar_words')
 
 
+@app.route('/unfamiliar_words', methods=['POST'])
+def unfamiliar_words_partial():
+    with open(WORDS_CSV_PATH, encoding='utf-8') as f:
+        csv_header, *word_list = list(csv.reader(f))
+
+    selected_file = request.form.get('file', '')
+    selected_date = request.form.get('date', '')
+    selected_difficulty = request.form.get('difficulty', '')
+    sort_by = request.form.get('sort_by', '-1')
+    is_reversed = request.form.get('reverse_sort', 'False')
+
+    filtered_word_list = apply_filters(word_list, selected_file, selected_date, selected_difficulty)
+    filtered_and_sorted_word_list = sort_records(sort_by, is_reversed, filtered_word_list)
+
+    # Render the table template with the filtered and sorted word list
+    return render_template('dictionary_table.html', filtered_word_list=filtered_and_sorted_word_list, csv_header=csv_header)
+
+
 @app.route('/pdf/<path:filename>')
 def pdf(filename):
     return send_from_directory(os.path.join(app.root_path, 'documents'), filename)
