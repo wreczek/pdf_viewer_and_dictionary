@@ -42,9 +42,7 @@ def get_available_files():
     return pdf_files
 
 
-def apply_filters(word_list, selected_file, selected_date, selected_difficulty):
-    filtered_list = word_list
-
+def map_difficulty(difficulty):
     difficulty_mapping = {
         "1": "easy",
         "2": "easy",
@@ -57,37 +55,29 @@ def apply_filters(word_list, selected_file, selected_date, selected_difficulty):
         "9": "hard",
         "10": "hard"
     }
+    return difficulty_mapping.get(difficulty, difficulty)
 
-    def map_difficulty(difficulty):
-        return difficulty_mapping.get(difficulty, difficulty)
 
-    def filter_list(values, filter_, index, func=lambda x: x):
-        if not filter_:
-            return values
+def parse_and_format_date(date_str):
+    return parse(date_str).strftime('%Y-%m-%d')
 
-        return [word
-                for word in values
-                if func(word[index]) == filter_]
 
-    filtered_list = filter_list(filtered_list, selected_file, 2)
-    filtered_list = filter_list(filtered_list, selected_date, 3,
-                                lambda x: parse(x).strftime('%Y-%m-%d'))
-    filtered_list = filter_list(filtered_list, selected_difficulty, 4,
-                                lambda x: map_difficulty(x))
+def filter_list(values, filter_, index, func=lambda x: x):
+    if not filter_:
+        return values
+    return [word for word in values if func(word[index]) == filter_]
 
+
+def apply_filters(word_list, selected_file, selected_date, selected_difficulty):
+    filtered_list = filter_list(word_list, selected_file, 2)
+    filtered_list = filter_list(filtered_list, selected_date, 3, func=parse_and_format_date)
+    filtered_list = filter_list(filtered_list, selected_difficulty, 4, func=map_difficulty)
     return filtered_list
 
 
-def sort_records(sort_by, is_reversed, filtered_word_list):
-    if is_reversed == 'on':
-        is_reversed = True
-    else:
-        is_reversed = False
-
+def sort_records(sort_by, is_reversed, filtered_word_list):#todo
     if sort_by == '-1':
-        filtered_and_sorted_word_list = filtered_word_list
-    else:
-        filtered_and_sorted_word_list = sorted(filtered_word_list,
-                                               key=lambda x: x[int(sort_by)].lower(),
-                                               reverse=is_reversed)
-    return filtered_and_sorted_word_list
+        return filtered_word_list
+
+    _is_reversed = is_reversed == 'on'
+    return sorted(filtered_word_list, key=lambda x: x[int(sort_by)].lower(), reverse=_is_reversed)

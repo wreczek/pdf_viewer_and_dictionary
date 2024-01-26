@@ -17,7 +17,8 @@ from werkzeug.security import check_password_hash, generate_password_hash
 
 from config import load_config
 from utils import (
-    apply_filters, get_access_date, get_available_files, get_status, get_upload_date, sort_records
+    apply_filters, get_access_date, get_available_files, get_status, get_upload_date, sort_records,
+    parse_and_format_date
 )
 
 app = Flask(__name__)
@@ -79,6 +80,11 @@ def index():
 def unfamiliar_words():
     with open(WORDS_CSV_PATH, encoding='utf-8') as f:
         csv_header, *word_list = list(csv.reader(f))
+
+    word_list = [
+        [*inner_list[:3], parse_and_format_date(inner_list[3]), *inner_list[4:]]
+        if inner_list and len(inner_list) >= 4 else inner_list
+        for inner_list in word_list]
 
     selected_file = request.form.get('file', '')
     selected_date = request.form.get('date', '')
@@ -271,3 +277,4 @@ if __name__ == "__main__":
 #   4. naprawić details przycisk
 #   5. naprawic dashboard (po kliknieciu przenosi do dashboardu a pozniej przy logout jest wiadomosc o login)
 #   6. być może apply filter nie powinien odświeżać całej strony tylko samą tabelkę?
+#   7. ogarnac zmiany z 3 commitami wstecz (slim vs no slim, czemu nie dziala, co powinno dzialac) 47e

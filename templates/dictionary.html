@@ -41,12 +41,9 @@
                 <label for="sort_by" class="form-label">Sort by:</label>
                 <select name="sort_by" id="sort_by" class="form-select">
                     <option value="-1">None</option>
-                    <option value="0">Column 1</option>
-                    <option value="1">Column 2</option>
-                    <option value="2">Column 3</option>
-                    <option value="3">Column 4</option>
-                    <option value="4">Column 5</option>
-                    <!-- Add options for other columns as needed -->
+                    {% for column in csv_header[:-1] %}
+                        <option value="{{ loop.index0 }}">{{ column }}</option>
+                    {% endfor %}
                 </select>
             </div>
         </div>
@@ -86,29 +83,4 @@
 </div>
 
 <script src="{{ url_for('static', filename='js/scripts.js') }}"></script>
-<script>
-    $(document).ready(function () {
-        $('#filterForm').submit(function (event) {
-            event.preventDefault();  // Prevent the default form submission
-
-            // Serialize form data
-            var formData = $(this).serialize();
-
-            // Send an AJAX request
-            $.ajax({
-                type: 'POST',
-                url: "{{ url_for('unfamiliar_words') }}",
-                data: formData,
-                success: function (data) {
-                    // Update the table content with the response
-                    $('#tableContainer').html(data);
-                },
-                error: function () {
-                    console.error('Error occurred during AJAX request');
-                }
-            });
-        });
-    });
-</script>
-
 {% endblock %}
