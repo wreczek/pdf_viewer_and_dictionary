@@ -188,7 +188,7 @@ def register():
         db.session.add(new_user)
         db.session.commit()
         flash('Account created successfully! You can now log in.', 'success')
-        return redirect(url_for('login'))
+        return redirect(url_for('auth.login'))
 
     return render_template('register.html', form=form)
 
@@ -219,7 +219,7 @@ def register():
 def logout():
     logout_user()
     flash('Logout successful!', 'success')
-    return redirect(url_for('login'))
+    return redirect(url_for('auth.login'))  # TODO: auth.login
 
 
 @app.route('/dashboard')

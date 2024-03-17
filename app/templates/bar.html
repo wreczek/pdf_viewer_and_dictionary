@@ -46,7 +46,7 @@
             </div>
         {% else %}
             <!-- User is not logged in -->
-            <div class="login-icon" onclick="window.location.href='{{ url_for('login') }}';" title="Login">
+            <div class="login-icon" onclick="window.location.href='{{ url_for('auth.login') }}';" title="Login">
                 <i class="fas fa-sign-in-alt"></i>
             </div>
             <div class="register-icon" onclick="window.location.href='{{ url_for('register') }}';" title="Register">

@@ -2,10 +2,10 @@ from flask import Flask
 from flask_login import LoginManager
 from flask_migrate import Migrate
 
+from app.auth.routes import *
 from app.extensions import db
+from app.main.routes import *
 from config import load_config
-from .auth import auth_bp
-from .main import main_bp
 
 # Initialize extensions without passing the app object
 login_manager = LoginManager()
@@ -23,7 +23,7 @@ def create_app():
     app.config['STATIC_FOLDER'] = config.static_folder
     app.static_folder = config.static_folder
     app.upload_folder = config.upload_folder
-    app.config['SERVER_NAME'] = '127.0.0.1:5000'  # Add this line
+    # app.config['SERVER_NAME'] = '127.0.0.1:5000'  # Add this line
 
     # Initialize extensions with the app object
     db.init_app(app)
