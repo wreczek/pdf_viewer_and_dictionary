@@ -1,4 +1,3 @@
-<!-- dashboard.html -->
 {% extends 'bar.html' %}
 
 {% block title %}
@@ -6,5 +5,5 @@
 {% endblock %}
 
 {% block content %}
-    <p>Hello, {{ current_user_id }}! This is your dashboard.</p>
+<p>Hello, {{ current_user.id }}! This is your dashboard.</p>
 {% endblock %}
