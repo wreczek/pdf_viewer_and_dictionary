@@ -176,10 +176,8 @@ if __name__ == "__main__":
     app.run(debug=True)
 
 #  TODO: 1. upload date to inna data (wydaje sie ze access date przy uploadzie jest ok)
-#   2. login/logout/profil w bar.html
-#   3. dodac archiwum? tam trafiaja usuniete slowa, a z archiwum mozna je juz usunac na zawsze
-#   4. naprawić details przycisk
-#   5. fix dashboard (po kliku przenosi do dashboardu a pozniej przy logout jest wiadomosc o login)
-#   6. być może apply filter nie powinien odświeżać całej strony tylko samą tabelkę?
-#   7. ogarnac zmiany z 3 commitami wstecz (slim vs no slim, czemu nie dziala, co powinno dzialac)
+#   2. dodac archiwum? tam trafiaja usuniete slowa, a z archiwum mozna je juz usunac na zawsze
+#   3. naprawić details przycisk
+#   4. być może apply filter nie powinien odświeżać całej strony tylko samą tabelkę?
+#   5. ogarnac zmiany z 3 commitami wstecz (slim vs no slim, czemu nie dziala, co powinno dzialac)
 #       commit 47e...
