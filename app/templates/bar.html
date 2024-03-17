@@ -38,10 +38,10 @@
 
         {% if current_user.is_authenticated %}
             <!-- User is logged in -->
-            <div class="profile-icon" onclick="window.location.href='{{ url_for('dashboard') }}';" title="Profile">
+            <div class="profile-icon" onclick="window.location.href='{{ url_for('main.dashboard') }}';" title="Profile">
                 <i class="fas fa-user"></i>
             </div>
-            <div class="logout-icon" onclick="window.location.href='{{ url_for('logout') }}';" title="Logout">
+            <div class="logout-icon" onclick="window.location.href='{{ url_for('auth.logout') }}';" title="Logout">
                 <i class="fas fa-sign-out-alt"></i>
             </div>
         {% else %}
@@ -49,7 +49,7 @@
             <div class="login-icon" onclick="window.location.href='{{ url_for('auth.login') }}';" title="Login">
                 <i class="fas fa-sign-in-alt"></i>
             </div>
-            <div class="register-icon" onclick="window.location.href='{{ url_for('register') }}';" title="Register">
+            <div class="register-icon" onclick="window.location.href='{{ url_for('auth.register') }}';" title="Register">
                 <i class="fas fa-user-plus"></i>
             </div>
         {% endif %}

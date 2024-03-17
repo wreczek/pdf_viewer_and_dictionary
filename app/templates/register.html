@@ -24,7 +24,7 @@
             </ul>
         {% endif %}
     {% endwith %}
-    <form method="post" action="{{ url_for('register') }}">
+<form action="{{ url_for('auth.register') }}" method="post">
         {{ form.csrf_token }}
         {{ form.username.label }} {{ form.username }}
         {{ form.password.label }} {{ form.password }}

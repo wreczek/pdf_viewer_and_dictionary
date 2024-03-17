@@ -178,19 +178,19 @@ def fetch_updated_content():
     return updated_content
 
 
-@app.route('/register', methods=['GET', 'POST'])
-def register():
-    form = RegistrationForm()
-
-    if form.validate_on_submit():
-        hashed_password = generate_password_hash(form.password.data)
-        new_user = User(username=form.username.data, password=hashed_password)
-        db.session.add(new_user)
-        db.session.commit()
-        flash('Account created successfully! You can now log in.', 'success')
-        return redirect(url_for('auth.login'))
-
-    return render_template('register.html', form=form)
+# @app.route('/register', methods=['GET', 'POST'])
+# def register():
+#     form = RegistrationForm()
+#
+#     if form.validate_on_submit():
+#         hashed_password = generate_password_hash(form.password.data)
+#         new_user = User(username=form.username.data, password=hashed_password)
+#         db.session.add(new_user)
+#         db.session.commit()
+#         flash('Account created successfully! You can now log in.', 'success')
+#         return redirect(url_for('auth.login'))
+#
+#     return render_template('register.html', form=form)
 
 
 # @app.route('/login', methods=['GET', 'POST'])
@@ -214,19 +214,19 @@ def register():
 #     return render_template('login.html', form=form)
 
 
-@app.route('/logout')
-@login_required
-def logout():
-    logout_user()
-    flash('Logout successful!', 'success')
-    return redirect(url_for('auth.login'))  # TODO: auth.login
+# @app.route('/logout')
+# @login_required
+# def logout():
+#     logout_user()
+#     flash('Logout successful!', 'success')
+#     return redirect(url_for('auth.login'))  # TODO: auth.login
 
 
-@app.route('/dashboard')
-@login_required
-def dashboard():
-    return render_template('dashboard.html',
-                           current_user_id=current_user.id)
+# @app.route('/dashboard')
+# @login_required
+# def dashboard():
+#     return render_template('dashboard.html',
+#                            current_user_id=current_user.id)
 
 
 if __name__ == "__main__":
