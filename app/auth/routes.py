@@ -1,3 +1,5 @@
+from sqlite3 import IntegrityError
+
 from flask import render_template, url_for, flash, redirect, request
 from flask_login import login_user, current_user, logout_user, login_required
 from werkzeug.security import generate_password_hash, check_password_hash
@@ -14,12 +16,21 @@ def register():
         return redirect(url_for('main.index'))
     form = RegistrationForm()
     if form.validate_on_submit():
+        existing_user = User.query.filter_by(username=form.username.data).first()
+        if existing_user is not None:
+            flash('Username already taken. Please choose a different one.', 'danger')
+            return redirect(url_for('auth.register'))
+
         hashed_password = generate_password_hash(form.password.data)
         user = User(username=form.username.data, password=hashed_password)
         db.session.add(user)
-        db.session.commit()
-        flash('Your account has been created! You are now able to log in', 'success')
-        return redirect(url_for('auth.login'))
+        try:
+            db.session.commit()
+            flash('Your account has been created! You are now able to log in', 'success')
+            return redirect(url_for('auth.login'))
+        except IntegrityError:
+            db.session.rollback()
+            flash('Username already taken. Please choose a different one.', 'danger')
     return render_template('register.html', title='Register', form=form)
 
 
