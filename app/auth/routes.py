@@ -44,5 +44,4 @@ def login():
 def logout():
     logout_user()
     flash('Logout successful!', 'success')
-    return redirect(url_for('auth.login'))
-    # return redirect(url_for('main.index'))  # TODO: gpt4 poleca
+    return redirect(url_for('main.index'))
