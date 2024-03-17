@@ -6,12 +6,12 @@ from flask import (
     jsonify, redirect, request, render_template, send_from_directory, url_for, flash
 )
 from flask_login import (
-    current_user, login_required, login_user, logout_user
+    current_user, login_required, logout_user
 )
-from werkzeug.security import generate_password_hash, check_password_hash
+from werkzeug.security import generate_password_hash
 
 from app.app_factory import create_app, login_manager
-from app.auth.forms import RegistrationForm, LoginForm
+from app.auth.forms import RegistrationForm
 from app.extensions import db
 from app.models import User
 from utils import (
