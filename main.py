@@ -3,16 +3,10 @@ import os
 
 import pandas as pd
 from flask import (
-    jsonify, redirect, request, render_template, send_from_directory, url_for, flash
+    jsonify, redirect, request, render_template, send_from_directory, url_for
 )
-from flask_login import (
-    current_user, login_required, logout_user
-)
-from werkzeug.security import generate_password_hash
 
 from app.app_factory import create_app, login_manager
-from app.auth.forms import RegistrationForm
-from app.extensions import db
 from app.models import User
 from utils import (
     apply_filters, get_access_date, get_available_files, get_status, get_upload_date, sort_records,
@@ -176,57 +170,6 @@ def fetch_updated_content():
                                       active_page='unfamiliar_words')
 
     return updated_content
-
-
-# @app.route('/register', methods=['GET', 'POST'])
-# def register():
-#     form = RegistrationForm()
-#
-#     if form.validate_on_submit():
-#         hashed_password = generate_password_hash(form.password.data)
-#         new_user = User(username=form.username.data, password=hashed_password)
-#         db.session.add(new_user)
-#         db.session.commit()
-#         flash('Account created successfully! You can now log in.', 'success')
-#         return redirect(url_for('auth.login'))
-#
-#     return render_template('register.html', form=form)
-
-
-# @app.route('/login', methods=['GET', 'POST'])
-# def login():
-#     form = LoginForm()
-#
-#     if form.validate_on_submit():
-#         username = form.username.data
-#         password = form.password.data
-#
-#         user = User.query.filter_by(username=username).first()
-#
-#         if user and check_password_hash(user.password, password):
-#             login_user(user)
-#             print(f'User ID after login: {user.id}')
-#             flash('Login successful!', 'success')
-#             return redirect(url_for('dashboard'))
-#         else:
-#             flash('Invalid username or password', 'danger')
-#
-#     return render_template('login.html', form=form)
-
-
-# @app.route('/logout')
-# @login_required
-# def logout():
-#     logout_user()
-#     flash('Logout successful!', 'success')
-#     return redirect(url_for('auth.login'))  # TODO: auth.login
-
-
-# @app.route('/dashboard')
-# @login_required
-# def dashboard():
-#     return render_template('dashboard.html',
-#                            current_user_id=current_user.id)
 
 
 if __name__ == "__main__":
