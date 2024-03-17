@@ -27,8 +27,17 @@
 <form action="{{ url_for('auth.register') }}" method="post">
         {{ form.csrf_token }}
         {{ form.username.label }} {{ form.username }}
+    {% for error in form.username.errors %}
+    <span style="color: red;">[{{ error }}]</span>
+    {% endfor %}
         {{ form.password.label }} {{ form.password }}
+    {% for error in form.password.errors %}
+    <span style="color: red;">[{{ error }}]</span>
+    {% endfor %}
         {{ form.confirm_password.label }} {{ form.confirm_password }}
+    {% for error in form.confirm_password.errors %}
+    <span style="color: red;">[{{ error }}]</span>
+    {% endfor %}
         {{ form.submit }}
     </form>
 {% endblock %}
