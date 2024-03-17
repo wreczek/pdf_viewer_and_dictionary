@@ -112,3 +112,15 @@ body {
     color: black;
     margin-right: 5px;
 }
+
+.container {
+    width: 90%; /* Adjust as needed */
+    height: 91.49vh; /* Use viewport height */
+    margin: 0 auto; /* Center the container */
+}
+
+@media (max-width: 992px) {
+  .container {
+    min-height: 80vh;
+  }
+}

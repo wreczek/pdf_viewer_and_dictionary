@@ -1,13 +1,17 @@
-import yaml
+import os
 from dataclasses import dataclass, field
 
-CONFIG_PATH = "env/main.yaml"
+import yaml
+
+BASE_DIR = os.path.abspath(os.path.dirname(__file__))
+CONFIG_PATH = os.path.join(BASE_DIR, "env", "main.yaml")
 
 
 @dataclass
 class AppConfig:
-    upload_folder: str = field(default="documents")
-    words_csv_path: str = field(default="./db/familiar_words.csv")
+    upload_folder: str = field(default=os.path.join(BASE_DIR, 'app', "documents"))
+    static_folder: str = field(default=os.path.join(BASE_DIR, 'static'))
+    words_csv_path: str = field(default=os.path.join(BASE_DIR, "db", "familiar_words.csv"))
 
 
 def load_config():

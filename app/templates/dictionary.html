@@ -10,11 +10,12 @@
     <h1 class="mb-4">List of Unfamiliar Words</h1>
 
     <!-- Filter Form -->
-    <form method="post" action="{{ url_for('unfamiliar_words') }}" class="filter-form" id="filterForm">
+    <form action="{{ url_for('unfamiliar_words') }}" class="filter-form" id="filterForm"
+          method="post">
         <div class="row">
             <div class="col-md-3 mb-3">
-                <label for="file" class="form-label">Filter by File:</label>
-                <select name="file" id="file" class="form-select">
+                <label class="form-label" for="file">Filter by File:</label>
+                <select class="form-select" id="file" name="file">
                     <option value="">All</option>
                     {% for file in available_files %}
                         <option value="{{ file }}">{{ file }}</option>
@@ -23,13 +24,13 @@
             </div>
 
             <div class="col-md-3 mb-3">
-                <label for="date" class="form-label">Filter by Date:</label>
-                <input type="date" name="date" id="date" class="form-control">
+                <label class="form-label" for="date">Filter by Date:</label>
+                <input class="form-control" id="date" name="date" type="date">
             </div>
 
             <div class="col-md-3 mb-3">
-                <label for="difficulty" class="form-label">Filter by Difficulty:</label>
-                <select name="difficulty" id="difficulty" class="form-select">
+                <label class="form-label" for="difficulty">Filter by Difficulty:</label>
+                <select class="form-select" id="difficulty" name="difficulty">
                     <option value="">All</option>
                     <option value="easy">Easy</option>
                     <option value="medium">Medium</option>
@@ -38,8 +39,8 @@
             </div>
 
             <div class="col-md-3 mb-3">
-                <label for="sort_by" class="form-label">Sort by:</label>
-                <select name="sort_by" id="sort_by" class="form-select">
+                <label class="form-label" for="sort_by">Sort by:</label>
+                <select class="form-select" id="sort_by" name="sort_by">
                     <option value="-1">None</option>
                     {% for column in csv_header[:-1] %}
                         <option value="{{ loop.index0 }}">{{ column }}</option>
@@ -49,32 +50,37 @@
         </div>
 
         <div class="form-check mb-3">
-            <input type="checkbox" class="form-check-input" name="reverse_sort" id="reverse_sort">
+            <input class="form-check-input" id="reverse_sort" name="reverse_sort" type="checkbox">
             <label class="form-check-label" for="reverse_sort">Reverse Sort</label>
         </div>
 
         <div class="d-grid">
-            <button type="submit" class="btn btn-primary">Apply Filter</button>
+            <button class="btn btn-primary" type="submit">Apply Filter</button>
         </div>
     </form>
 
     {% include 'dictionary_table.html' %}
 
     <!-- Modal for Word Details -->
-    <div class="modal fade" id="wordDetailsModal" tabindex="-1" aria-labelledby="wordDetailsModalLabel" aria-hidden="true">
+    <div aria-hidden="true" aria-labelledby="wordDetailsModalLabel" class="modal fade"
+         id="wordDetailsModal" tabindex="-1">
         <div class="modal-dialog">
             <div class="modal-content">
                 <div class="modal-header">
                     <h5 class="modal-title" id="wordDetailsModalLabel">Word Details</h5>
-                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                    <button aria-label="Close" class="btn-close" data-bs-dismiss="modal"
+                            type="button"></button>
                 </div>
                 <div class="modal-body">
                     <!-- Word details will be displayed here -->
                     <p id="wordDetails"></p>
                 </div>
                 <div class="modal-footer">
-                    <button type="button" class="btn btn-success" onclick="acceptChanges()">Accept</button>
-                    <button type="button" class="btn btn-danger" onclick="removeWord()" data-bs-dismiss="modal">Remove</button>
+                    <button class="btn btn-success" onclick="acceptChanges()" type="button">Accept
+                    </button>
+                    <button class="btn btn-danger" data-bs-dismiss="modal" onclick="removeWord()"
+                            type="button">Remove
+                    </button>
                 </div>
             </div>
         </div>

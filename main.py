@@ -1,62 +1,27 @@
-import os
 import csv
+import os
 
+import pandas as pd
 from flask import (
-    flash, Flask, jsonify, redirect, request, render_template, send_from_directory, url_for
+    jsonify, redirect, request, render_template, send_from_directory, url_for, flash
 )
 from flask_login import (
-    current_user, login_required, login_user, logout_user, LoginManager, UserMixin
+    current_user, login_required, login_user, logout_user
 )
-from flask_migrate import Migrate
-from flask_sqlalchemy import SQLAlchemy
-from flask_wtf import FlaskForm
-import pandas as pd
-from wtforms import PasswordField, StringField, SubmitField
-from wtforms.validators import DataRequired, EqualTo
-from werkzeug.security import check_password_hash, generate_password_hash
+from werkzeug.security import generate_password_hash, check_password_hash
 
-from config import load_config
+from app.app_factory import create_app, login_manager
+from app.auth.forms import RegistrationForm, LoginForm
+from app.extensions import db
+from app.models import User
 from utils import (
     apply_filters, get_access_date, get_available_files, get_status, get_upload_date, sort_records,
-    parse_and_format_date
+    parse_and_format_date, config
 )
 
-app = Flask(__name__)
-config = load_config()
+app = create_app()
 
-UPLOAD_FOLDER = config.upload_folder
 WORDS_CSV_PATH = config.words_csv_path
-
-app.config['SECRET_KEY'] = 'your_secret_key'  # TODO: Change this to a secure secret key
-app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///site.db'
-app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
-
-login_manager = LoginManager(app)
-login_manager.login_view = 'login'
-
-db = SQLAlchemy(app)
-migrate = Migrate(app, db)
-
-
-class RegistrationForm(FlaskForm):
-    username = StringField('Username', validators=[DataRequired()])
-    password = PasswordField('Password', validators=[DataRequired()])
-    confirm_password = PasswordField('Confirm Password',
-                                     validators=[DataRequired(), EqualTo('password')])
-    submit = SubmitField('Register')
-
-
-class User(db.Model, UserMixin):
-    id = db.Column(db.Integer, primary_key=True)
-    username = db.Column(db.String(50), unique=True, nullable=False)
-    password = db.Column(db.String(200), nullable=False)
-
-    def __init__(self, username, password):
-        self.username = username
-        self.password = password
-
-    def get_id(self):
-        return str(self.id)
 
 
 @login_manager.user_loader
@@ -65,13 +30,7 @@ def load_user(user_id):
     return User.query.get(int(user_id))
 
 
-class LoginForm(FlaskForm):
-    username = StringField('Username', validators=[DataRequired()])
-    password = PasswordField('Password', validators=[DataRequired()])
-    submit = SubmitField('Login')
-
-
-@app.route('/')
+@app.route('/')  # TODO: usunac bo blueprint
 def index():
     return render_template("home.html", active_page='index')
 
@@ -118,12 +77,14 @@ def unfamiliar_words_partial():
     filtered_and_sorted_word_list = sort_records(sort_by, is_reversed, filtered_word_list)
 
     # Render the table template with the filtered and sorted word list
-    return render_template('dictionary_table.html', filtered_word_list=filtered_and_sorted_word_list, csv_header=csv_header)
+    return render_template('dictionary_table.html',
+                           filtered_word_list=filtered_and_sorted_word_list,
+                           csv_header=csv_header)
 
 
 @app.route('/pdf/<path:filename>')
 def pdf(filename):
-    return send_from_directory(os.path.join(app.root_path, 'documents'), filename)
+    return send_from_directory(app.upload_folder, filename)
 
 
 @app.route('/file_list')
@@ -217,27 +178,6 @@ def fetch_updated_content():
     return updated_content
 
 
-@app.route('/login', methods=['GET', 'POST'])
-def login():
-    form = LoginForm()
-
-    if form.validate_on_submit():
-        username = form.username.data
-        password = form.password.data
-
-        user = User.query.filter_by(username=username).first()
-
-        if user and check_password_hash(user.password, password):
-            login_user(user)
-            print(f'User ID after login: {user.id}')
-            flash('Login successful!', 'success')
-            return redirect(url_for('dashboard'))
-        else:
-            flash('Invalid username or password', 'danger')
-
-    return render_template('login.html', form=form)
-
-
 @app.route('/register', methods=['GET', 'POST'])
 def register():
     form = RegistrationForm()
@@ -251,6 +191,27 @@ def register():
         return redirect(url_for('login'))
 
     return render_template('register.html', form=form)
+
+
+# @app.route('/login', methods=['GET', 'POST'])
+# def login():
+#     form = LoginForm()
+#
+#     if form.validate_on_submit():
+#         username = form.username.data
+#         password = form.password.data
+#
+#         user = User.query.filter_by(username=username).first()
+#
+#         if user and check_password_hash(user.password, password):
+#             login_user(user)
+#             print(f'User ID after login: {user.id}')
+#             flash('Login successful!', 'success')
+#             return redirect(url_for('dashboard'))
+#         else:
+#             flash('Invalid username or password', 'danger')
+#
+#     return render_template('login.html', form=form)
 
 
 @app.route('/logout')
@@ -273,8 +234,9 @@ if __name__ == "__main__":
 
 #  TODO: 1. upload date to inna data (wydaje sie ze access date przy uploadzie jest ok)
 #   2. login/logout/profil w bar.html
-#   3. dodac cos w stylu archiwum? tam trafiaja usuniete slowa, a z archiwum mozna je juz usunac na zawsze
+#   3. dodac archiwum? tam trafiaja usuniete slowa, a z archiwum mozna je juz usunac na zawsze
 #   4. naprawić details przycisk
-#   5. naprawic dashboard (po kliknieciu przenosi do dashboardu a pozniej przy logout jest wiadomosc o login)
+#   5. fix dashboard (po kliku przenosi do dashboardu a pozniej przy logout jest wiadomosc o login)
 #   6. być może apply filter nie powinien odświeżać całej strony tylko samą tabelkę?
-#   7. ogarnac zmiany z 3 commitami wstecz (slim vs no slim, czemu nie dziala, co powinno dzialac) 47e
+#   7. ogarnac zmiany z 3 commitami wstecz (slim vs no slim, czemu nie dziala, co powinno dzialac)
+#       commit 47e...
