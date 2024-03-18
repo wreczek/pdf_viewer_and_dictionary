@@ -3,8 +3,9 @@ import os
 
 import pandas as pd
 from flask import (
-    jsonify, redirect, request, render_template, send_from_directory, url_for
+    jsonify, redirect, request, render_template, send_from_directory, url_for, flash
 )
+from werkzeug.utils import secure_filename
 
 from app.app_factory import create_app, login_manager
 from app.models import User
@@ -16,6 +17,13 @@ from utils import (
 app = create_app()
 
 WORDS_CSV_PATH = config.words_csv_path
+
+ALLOWED_EXTENSIONS = {'txt', 'pdf', 'png', 'jpg', 'jpeg', 'gif'}
+
+
+def allowed_file(filename):
+    return '.' in filename and \
+        filename.rsplit('.', 1)[1].lower() in ALLOWED_EXTENSIONS
 
 
 @login_manager.user_loader
@@ -125,9 +133,21 @@ def upload_file():
     if request.method == 'POST' and 'file' in request.files:
         file = request.files['file']
         if file.filename != '':
-            filename = os.path.join(app.config['UPLOAD_FOLDER'], file.filename)
-            file.save(filename)
+            try:
+                filename = secure_filename(file.filename)
+                if allowed_file(filename):
+                    file.save(os.path.join(app.config['UPLOAD_FOLDER'], filename))
+                else:
+                    flash('File type is not allowed.', 'danger')
+                    return redirect(request.url)
+            except Exception as e:
+                flash(str(e), 'danger')
+                return redirect(request.url)
+            flash('File successfully uploaded!', 'success')
             return redirect(url_for('file_list'))
+        else:
+            flash('No selected file.', 'danger')
+            return redirect(request.url)
     return render_template('upload.html', active_page='upload_file')
 
 
