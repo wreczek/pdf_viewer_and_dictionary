@@ -1,4 +1,3 @@
-import csv
 import os
 
 import pandas as pd
@@ -10,8 +9,8 @@ from werkzeug.utils import secure_filename
 from app.app_factory import create_app, login_manager
 from app.models import User
 from utils import (
-    apply_filters, get_access_date, get_available_files, get_status, get_upload_date, sort_records,
-    parse_and_format_date, config
+    get_access_date, get_available_files, get_status, get_upload_date, config, read_and_process_csv,
+    apply_filters_and_sort
 )
 
 app = create_app()
@@ -39,22 +38,8 @@ def index():
 
 @app.route('/unfamiliar_words', methods=['GET', 'POST'])
 def unfamiliar_words():
-    with open(WORDS_CSV_PATH, encoding='utf-8') as f:
-        csv_header, *word_list = list(csv.reader(f))
-
-    word_list = [
-        [*inner_list[:3], parse_and_format_date(inner_list[3]), *inner_list[4:]]
-        if inner_list and len(inner_list) >= 4 else inner_list
-        for inner_list in word_list]
-
-    selected_file = request.form.get('file', '')
-    selected_date = request.form.get('date', '')
-    selected_difficulty = request.form.get('difficulty', '')
-    sort_by = request.form.get('sort_by', '-1')
-    is_reversed = request.form.get('reverse_sort', 'False')
-
-    filtered_word_list = apply_filters(word_list, selected_file, selected_date, selected_difficulty)
-    filtered_and_sorted_word_list = sort_records(sort_by, is_reversed, filtered_word_list)
+    csv_header, word_list = read_and_process_csv(WORDS_CSV_PATH)
+    filtered_and_sorted_word_list = apply_filters_and_sort(word_list)
     available_files = get_available_files()
 
     return render_template('dictionary.html',
@@ -66,17 +51,8 @@ def unfamiliar_words():
 
 @app.route('/unfamiliar_words', methods=['POST'])
 def unfamiliar_words_partial():
-    with open(WORDS_CSV_PATH, encoding='utf-8') as f:
-        csv_header, *word_list = list(csv.reader(f))
-
-    selected_file = request.form.get('file', '')
-    selected_date = request.form.get('date', '')
-    selected_difficulty = request.form.get('difficulty', '')
-    sort_by = request.form.get('sort_by', '-1')
-    is_reversed = request.form.get('reverse_sort', 'False')
-
-    filtered_word_list = apply_filters(word_list, selected_file, selected_date, selected_difficulty)
-    filtered_and_sorted_word_list = sort_records(sort_by, is_reversed, filtered_word_list)
+    csv_header, word_list = read_and_process_csv(WORDS_CSV_PATH)
+    filtered_and_sorted_word_list = apply_filters_and_sort(word_list)
 
     # Render the table template with the filtered and sorted word list
     return render_template('dictionary_table.html',
@@ -170,17 +146,8 @@ def get_updated_content():
 
 
 def fetch_updated_content():
-    with open(WORDS_CSV_PATH, encoding='utf-8') as f:
-        csv_header, *word_list = list(csv.reader(f))
-
-    selected_file = request.form.get('file', '')
-    selected_date = request.form.get('date', '')
-    selected_difficulty = request.form.get('difficulty', '')
-    sort_by = request.form.get('sort_by', '-1')
-    is_reversed = request.form.get('reverse_sort', 'False')
-
-    filtered_word_list = apply_filters(word_list, selected_file, selected_date, selected_difficulty)
-    filtered_and_sorted_word_list = sort_records(sort_by, is_reversed, filtered_word_list)
+    csv_header, word_list = read_and_process_csv(WORDS_CSV_PATH)
+    filtered_and_sorted_word_list = apply_filters_and_sort(word_list)
     available_files = get_available_files()
 
     updated_content = render_template('dictionary_table.html',
