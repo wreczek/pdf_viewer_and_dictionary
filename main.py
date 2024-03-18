@@ -86,7 +86,7 @@ def file_list():
     pdf_files_info = []
 
     for pdf_file in get_available_files():
-        file_path = os.path.join(app.config['UPLOAD_FOLDER'], pdf_file)
+        file_path = os.path.join(app.upload_folder, pdf_file)
         status = get_status(file_path)
         upload_date = get_upload_date(file_path)
         access_date = get_access_date(file_path)
@@ -181,3 +181,7 @@ if __name__ == "__main__":
 #   4. być może apply filter nie powinien odświeżać całej strony tylko samą tabelkę?
 #   5. ogarnac zmiany z 3 commitami wstecz (slim vs no slim, czemu nie dziala, co powinno dzialac)
 #       commit 47e...
+#   6. Dodac Word model, ORM i usuwanie dodawanie etc. przez ten model
+#   7. Add list_words endpoint with pagination
+#   8. Dodac informacje po nieudanym dodawaniu pliku dlaczego (np jpg)
+#   9. Usuwanie plikow z listy Files (i moze jakies inne manipulacje?)

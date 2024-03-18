@@ -28,9 +28,10 @@ def register():
             db.session.commit()
             flash('Your account has been created! You are now able to log in', 'success')
             return redirect(url_for('auth.login'))
-        except IntegrityError:
+        except IntegrityError as e:
             db.session.rollback()
             flash('Username already taken. Please choose a different one.', 'danger')
+            # app.logger.error(f'Error: {e}')  # TODO: dodac logging
     return render_template('register.html', title='Register', form=form)
 
 
