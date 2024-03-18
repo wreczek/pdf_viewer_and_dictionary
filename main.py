@@ -7,22 +7,19 @@ from flask import (
 from werkzeug.utils import secure_filename
 
 from app.app_factory import create_app, login_manager
+from app.file_manager.file_manager import FileManager
 from app.models import User
+from app.word_manager.word_manager import WordManager
 from utils import (
-    get_access_date, get_available_files, get_status, get_upload_date, config, read_and_process_csv,
-    apply_filters_and_sort
+    get_access_date, get_status, get_upload_date, config
 )
 
 app = create_app()
 
 WORDS_CSV_PATH = config.words_csv_path
 
-ALLOWED_EXTENSIONS = {'txt', 'pdf', 'png', 'jpg', 'jpeg', 'gif'}
-
-
-def allowed_file(filename):
-    return '.' in filename and \
-        filename.rsplit('.', 1)[1].lower() in ALLOWED_EXTENSIONS
+word_manager = WordManager(WORDS_CSV_PATH)
+file_manager = FileManager(app.upload_folder)
 
 
 @login_manager.user_loader
@@ -38,9 +35,9 @@ def index():
 
 @app.route('/unfamiliar_words', methods=['GET', 'POST'])
 def unfamiliar_words():
-    csv_header, word_list = read_and_process_csv(WORDS_CSV_PATH)
-    filtered_and_sorted_word_list = apply_filters_and_sort(word_list)
-    available_files = get_available_files()
+    csv_header, word_list = word_manager.read_and_process_csv()
+    filtered_and_sorted_word_list = word_manager.apply_filters_and_sort(word_list)
+    available_files = file_manager.get_available_files()
 
     return render_template('dictionary.html',
                            filtered_word_list=filtered_and_sorted_word_list,
@@ -51,8 +48,8 @@ def unfamiliar_words():
 
 @app.route('/unfamiliar_words', methods=['POST'])
 def unfamiliar_words_partial():
-    csv_header, word_list = read_and_process_csv(WORDS_CSV_PATH)
-    filtered_and_sorted_word_list = apply_filters_and_sort(word_list)
+    csv_header, word_list = word_manager.read_and_process_csv()
+    filtered_and_sorted_word_list = word_manager.apply_filters_and_sort(word_list)
 
     # Render the table template with the filtered and sorted word list
     return render_template('dictionary_table.html',
@@ -69,7 +66,7 @@ def pdf(filename):
 def file_list():
     pdf_files_info = []
 
-    for pdf_file in get_available_files():
+    for pdf_file in file_manager.get_available_files():
         file_path = os.path.join(app.upload_folder, pdf_file)
         status = get_status(file_path)
         upload_date = get_upload_date(file_path)
@@ -111,8 +108,8 @@ def upload_file():
         if file.filename != '':
             try:
                 filename = secure_filename(file.filename)
-                if allowed_file(filename):
-                    file.save(os.path.join(app.config['UPLOAD_FOLDER'], filename))
+                if file_manager.allowed_file(filename):
+                    file.save(os.path.join(app.upload_folder, filename))
                 else:
                     flash('File type is not allowed.', 'danger')
                     return redirect(request.url)
@@ -141,22 +138,8 @@ def delete_word(word_id):
 
 @app.route('/get_updated_content')
 def get_updated_content():
-    updated_content = fetch_updated_content()
+    updated_content = word_manager.fetch_updated_content(file_manager)
     return jsonify({'html': updated_content})
-
-
-def fetch_updated_content():
-    csv_header, word_list = read_and_process_csv(WORDS_CSV_PATH)
-    filtered_and_sorted_word_list = apply_filters_and_sort(word_list)
-    available_files = get_available_files()
-
-    updated_content = render_template('dictionary_table.html',
-                                      filtered_word_list=filtered_and_sorted_word_list,
-                                      available_files=available_files,
-                                      csv_header=csv_header,
-                                      active_page='unfamiliar_words')
-
-    return updated_content
 
 
 if __name__ == "__main__":
