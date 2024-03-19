@@ -3,7 +3,7 @@ from datetime import datetime
 
 from werkzeug.utils import secure_filename
 
-from utils import get_status, config
+from utils import config, get_status
 
 ALLOWED_EXTENSIONS = {'txt', 'pdf'}
 
@@ -13,85 +13,58 @@ class FileManager:
         self.upload_folder = upload_folder
 
     def upload_file(self, file):
-        """Uploads a file to the designated upload folder.
-
-        Args:
-          file: A file object from the request.
-
-        Returns:
-          A dictionary containing a success message or an error message.
-        """
-
-        if file.filename != '':
-            try:
-                filename = secure_filename(file.filename)
-                if self.allowed_file(filename):
-                    file.save(os.path.join(self.upload_folder, filename))
-                    return {'message': 'File successfully uploaded!', 'success': True}
-                else:
-                    return {'message': 'File type is not allowed.', 'error': True}
-            except Exception as e:
-                print(f"Error uploading file: {e}")
-                return {'message': str(e), 'error': True}
-        else:
+        """Uploads a file to the designated upload folder."""
+        if file.filename == '':
             return {'message': 'No selected file.', 'error': True}
 
+        filename = secure_filename(file.filename)
+        if not self.allowed_file(filename):
+            return {'message': 'File type is not allowed.', 'error': True}
+
+        try:
+            file_path = os.path.join(self.upload_folder, filename)
+            file.save(file_path)
+            return {'message': 'File successfully uploaded!', 'success': True}
+        except Exception as e:
+            return {'message': f"Error uploading file: {e}", 'error': True}
+
     def list_files(self):
-        """Retrieves information about available PDF files in the upload folder.
-
-        Returns:
-          A list of dictionaries containing details about each PDF file.
-        """
-
-        pdf_files_info = []
-        for pdf_file in self.get_available_files():
-            file_path = os.path.join(self.upload_folder, pdf_file)
-            status = get_status(file_path)
+        """Retrieves information about available files in the upload folder."""
+        files_info = []
+        for filename in self.get_available_files():
+            file_path = os.path.join(self.upload_folder, filename)
+            status = get_status(file_path)  # Ensure get_status is accessible or move its logic here
             upload_date = self.get_upload_date(file_path)
             access_date = self.get_access_date(file_path)
 
-            pdf_files_info.append({
-                'name': pdf_file,
+            files_info.append({
+                'name': filename,
                 'upload_date': upload_date,
                 'access_date': access_date,
                 'status': status
             })
 
-        pdf_files_info.sort(key=lambda x: x['access_date'], reverse=True)
-        return pdf_files_info
+        files_info.sort(key=lambda x: x['access_date'], reverse=True)
+        return files_info
 
     def delete_file(self, filename):
-        """Deletes a file from the upload folder.
+        """Deletes a file from the upload folder after ensuring it is a PDF and not a directory."""
+        # Ensure the filename is secure and the file extension is correct
+        filename = secure_filename(filename)
+        if not filename.lower().endswith('.pdf'):
+            return {'message': 'Only PDF files can be deleted.', 'error': True}
 
-        Args:
-          filename: The name of the file to be deleted.
+        file_path = os.path.join(self.upload_folder, filename)
 
-        Returns:
-          A dictionary containing a success message or an error message.
-        """
-
-        try:
-            file_path = os.path.join(self.upload_folder, filename)
-            if os.path.exists(file_path):
+        # Check if the file exists and is a file, not a directory
+        if os.path.isfile(file_path):
+            try:
                 os.remove(file_path)
-                return {'message': 'File deleted successfully!', 'success': True}
-            else:
-                return {'message': 'File not found.', 'error': True}
-        except Exception as e:
-            print(f"Error deleting file: {e}")
-            return {'message': str(e), 'error': True}
-
-    def get_pdf_path(self, filename):
-        """Returns the full path to a PDF file in the upload folder.
-
-        Args:
-          filename: The name of the PDF file.
-
-        Returns:
-          The full path to the file.
-        """
-
-        return os.path.join(self.upload_folder, filename)
+                return {'message': f'File {filename} deleted successfully!', 'success': True}
+            except Exception as e:
+                return {'message': f"Error deleting file: {e}", 'error': True}
+        else:
+            return {'message': 'File not found or is a directory.', 'error': True}
 
     @staticmethod
     def get_available_files():
