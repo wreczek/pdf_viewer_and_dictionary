@@ -2,6 +2,7 @@ import os
 from datetime import datetime
 
 from werkzeug.utils import secure_filename
+from win32_setctime import setctime
 
 from utils import config, get_status
 
@@ -24,6 +25,8 @@ class FileManager:
         try:
             file_path = os.path.join(self.upload_folder, filename)
             file.save(file_path)
+            current_time = datetime.now().timestamp()
+            setctime(file_path, current_time)
             return {'message': 'File successfully uploaded!', 'success': True}
         except Exception as e:
             return {'message': f"Error uploading file: {e}", 'error': True}

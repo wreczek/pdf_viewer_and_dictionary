@@ -1,3 +1,6 @@
+import os
+from datetime import datetime
+
 import pandas as pd
 from flask import (
     jsonify, request, render_template, send_from_directory, url_for
@@ -58,6 +61,13 @@ def pdf_viewer(filename):
 
     # Retrieve the last stored position from localStorage
     last_position = request.cookies.get(f'last_position_{filename}')
+
+    # Update access time
+    file_path = os.path.join(app.upload_folder, filename)
+    current_time = datetime.now().timestamp()
+
+    # Update the access time of the file
+    os.utime(file_path, (current_time, current_time))
 
     return render_template('pdf_viewer.html',
                            file_name=filename,
