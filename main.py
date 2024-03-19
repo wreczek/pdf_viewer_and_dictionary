@@ -98,13 +98,13 @@ def get_updated_content():
 if __name__ == "__main__":
     app.run(debug=True)
 
-#  TODO: 1. upload date to inna data (wydaje sie ze access date przy uploadzie jest ok)
-#   2. dodac archiwum? tam trafiaja usuniete slowa, a z archiwum mozna je juz usunac na zawsze
-#   3. naprawić details przycisk
-#   4. być może apply filter nie powinien odświeżać całej strony tylko samą tabelkę?
-#   5. ogarnac zmiany z 3 commitami wstecz (slim vs no slim, czemu nie dziala, co powinno dzialac)
+#  TODO:
+#   1. dodac archiwum? tam trafiaja usuniete slowa, a z archiwum mozna je juz usunac na zawsze
+#   2. details button - dodac funkcjonalnosc z planu
+#   3. być może apply filter nie powinien odświeżać całej strony tylko samą tabelkę?
+#   4. ogarnac zmiany z 3 commitami wstecz (slim vs no slim, czemu nie dziala, co powinno dzialac)
 #       commit 47e...
-#   6. Dodac Word model, ORM i usuwanie dodawanie etc. przez ten model
-#   7. Add list_words endpoint with pagination
-#   8. Dodac informacje po nieudanym dodawaniu pliku dlaczego (np jpg)
-#   9. Usuwanie plikow z listy Files (i moze jakies inne manipulacje?)
+#   5. Dodac Word model, ORM i usuwanie dodawanie etc. przez ten model
+#   6. Add list_words endpoint with pagination
+#   7. Dodac informacje po nieudanym dodawaniu pliku dlaczego (np jpg)
+#   8. Usuwanie plikow z listy Files (i moze jakies inne manipulacje?)
