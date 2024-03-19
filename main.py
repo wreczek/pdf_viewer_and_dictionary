@@ -23,11 +23,6 @@ def load_user(user_id):
     return User.query.get(int(user_id))
 
 
-@app.route('/')  # TODO: usunac bo blueprint
-def index():
-    return render_template("home.html", active_page='index')
-
-
 @app.route('/unfamiliar_words', methods=['GET', 'POST'])
 def unfamiliar_words():
     csv_header, word_list = word_manager.read_and_process_csv()
