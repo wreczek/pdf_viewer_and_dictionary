@@ -1,8 +1,9 @@
 import os
+from datetime import datetime
 
 from werkzeug.utils import secure_filename
 
-from utils import get_status, get_upload_date, get_access_date, config
+from utils import get_status, config
 
 ALLOWED_EXTENSIONS = {'txt', 'pdf'}
 
@@ -46,8 +47,8 @@ class FileManager:
         for pdf_file in self.get_available_files():
             file_path = os.path.join(self.upload_folder, pdf_file)
             status = get_status(file_path)
-            upload_date = get_upload_date(file_path)
-            access_date = get_access_date(file_path)
+            upload_date = self.get_upload_date(file_path)
+            access_date = self.get_access_date(file_path)
 
             pdf_files_info.append({
                 'name': pdf_file,
@@ -93,20 +94,6 @@ class FileManager:
         return os.path.join(self.upload_folder, filename)
 
     @staticmethod
-    def get_access_date(filepath):
-        """Calls the existing logic for retrieving access date (replace with your implementation)
-
-        Args:
-          filepath: The path to the file.
-
-        Returns:
-          (Placeholder) The access date retrieved by the existing logic.
-        """
-
-        # Replace this with your existing logic for getting access date
-        return get_access_date(filepath)
-
-    @staticmethod
     def get_available_files():
         pdf_files = [f for f in os.listdir(config.upload_folder) if f.endswith('.pdf')]
 
@@ -116,3 +103,23 @@ class FileManager:
     def allowed_file(filename: str):
         return '.' in filename and \
             filename.rsplit('.', 1)[1].lower() in ALLOWED_EXTENSIONS
+
+    @staticmethod
+    def get_access_date(file_path):
+        try:
+            access_time = os.path.getatime(file_path)
+            upload_date = datetime.fromtimestamp(access_time).strftime("%Y-%m-%d %H:%M:%S")
+            return upload_date
+        except Exception as e:
+            print(f"Error getting upload date: {e}")
+            return None
+
+    @staticmethod
+    def get_upload_date(file_path):
+        try:
+            creation_time = os.path.getctime(file_path)
+            upload_date = datetime.fromtimestamp(creation_time).strftime("%Y-%m-%d %H:%M:%S")
+            return upload_date
+        except Exception as e:
+            print(f"Error getting upload date: {e}")
+            return None

@@ -19,7 +19,8 @@
             {% for pdf_file_info in pdf_files_info %}
                 <tr>
                     <td>
-                        <a href="/file_list/{{ pdf_file_info['name'] }}">{{ pdf_file_info['name'] }}</a>
+                        <a href="/file_list/{{ pdf_file_info['name'] }}">{{
+                            pdf_file_info['name'] }}</a>
                     </td>
                     <td>{{ pdf_file_info['upload_date'] }}</td>
                     <td>{{ pdf_file_info['access_date'] }}</td>

@@ -4,6 +4,7 @@ from flask_migrate import Migrate
 
 from app.auth.routes import *
 from app.extensions import db
+from app.files.routes import *
 from app.main.routes import *
 from config import load_config
 
@@ -33,5 +34,6 @@ def create_app():
 
     app.register_blueprint(auth_bp, url_prefix='/auth')
     app.register_blueprint(main_bp)
+    app.register_blueprint(files_bp)
 
     return app

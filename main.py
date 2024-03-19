@@ -1,18 +1,13 @@
-import os
-
 import pandas as pd
 from flask import (
-    jsonify, redirect, request, render_template, send_from_directory, url_for, flash
+    jsonify, request, render_template, send_from_directory, url_for
 )
-from werkzeug.utils import secure_filename
 
 from app.app_factory import create_app, login_manager
-from app.file_manager.file_manager import FileManager
+from app.files.file_manager import FileManager
 from app.models import User
 from app.word_manager.word_manager import WordManager
-from utils import (
-    get_access_date, get_status, get_upload_date, config
-)
+from utils import config
 
 app = create_app()
 
@@ -62,30 +57,6 @@ def pdf(filename):
     return send_from_directory(app.upload_folder, filename)
 
 
-@app.route('/file_list')
-def file_list():
-    pdf_files_info = []
-
-    for pdf_file in file_manager.get_available_files():
-        file_path = os.path.join(app.upload_folder, pdf_file)
-        status = get_status(file_path)
-        upload_date = get_upload_date(file_path)
-        access_date = get_access_date(file_path)
-
-        pdf_files_info.append({
-            'name': pdf_file,
-            'upload_date': upload_date,
-            'access_date': access_date,
-            'status': status
-        })
-
-    pdf_files_info.sort(key=lambda x: x['access_date'], reverse=True)
-
-    return render_template('file_list.html',
-                           pdf_files_info=pdf_files_info,
-                           active_page='file_list')
-
-
 @app.route('/file_list/<path:filename>')
 def pdf_viewer(filename):
     pdf_path = url_for('pdf', filename=filename)
@@ -99,29 +70,6 @@ def pdf_viewer(filename):
                            pdf_path=pdf_path,
                            last_position=last_position,  # Pass last_position to the template
                            active_page='pdf_viewer')
-
-
-@app.route('/upload', methods=['GET', 'POST'])
-def upload_file():
-    if request.method == 'POST' and 'file' in request.files:
-        file = request.files['file']
-        if file.filename != '':
-            try:
-                filename = secure_filename(file.filename)
-                if file_manager.allowed_file(filename):
-                    file.save(os.path.join(app.upload_folder, filename))
-                else:
-                    flash('File type is not allowed.', 'danger')
-                    return redirect(request.url)
-            except Exception as e:
-                flash(str(e), 'danger')
-                return redirect(request.url)
-            flash('File successfully uploaded!', 'success')
-            return redirect(url_for('file_list'))
-        else:
-            flash('No selected file.', 'danger')
-            return redirect(request.url)
-    return render_template('upload.html', active_page='upload_file')
 
 
 @app.route('/delete_word/<word_id>', methods=['DELETE'])

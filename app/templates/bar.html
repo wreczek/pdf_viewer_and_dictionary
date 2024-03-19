@@ -19,7 +19,7 @@
 <body>
     <div class="nav-bar">
         <div>
-            <a href="{{ url_for('file_list') }}" {% if active_page == 'file_list' %}class="active"{% endif %}>Files</a>
+            <a href="{{ url_for('files.file_list') }}" {% if active_page == 'file_list' %}class="active"{% endif %}>Files</a>
         </div>
 
         <div>
@@ -56,7 +56,7 @@
 
         <div class="upload-icon" onclick="document.getElementById('file-input').click();" title="Upload File">
             <i class="fas fa-upload"></i>
-            <form id="upload-form" method="POST" action="{{ url_for('upload_file') }}" enctype="multipart/form-data" style="display: none;">
+            <form id="upload-form" method="POST" action="{{ url_for('files.upload_file') }}" enctype="multipart/form-data" style="display: none;">
                 <input type="file" name="file" id="file-input" onchange="document.getElementById('upload-form').submit();">
             </form>
         </div>
