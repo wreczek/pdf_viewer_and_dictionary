@@ -1,6 +1,7 @@
 from flask import Flask
 from flask_login import LoginManager
 from flask_migrate import Migrate
+from flask_wtf import CSRFProtect
 
 from app.auth.routes import *
 from app.errors.handlers import *
@@ -11,10 +12,13 @@ from config import load_config
 # Initialize extensions without passing the app object
 login_manager = LoginManager()
 migrate = Migrate()
+csrf = CSRFProtect()
 
 
 def create_app():
     app = Flask(__name__)
+    csrf.init_app(app)
+
     config = load_config()
     app.config.from_object(config)
 

@@ -5,9 +5,11 @@
 {% endblock %}
 
 {% block content %}
-    <h1>File Upload</h1>
-    <form method="POST" action="" enctype="multipart/form-data">
-        <p><input type="file" name="file"></p>
-        <p><input type="submit" value="Submit"></p>
-    </form>
+<h1>File Upload</h1>
+<form action="{{ url_for('files.upload_file') }}" enctype="multipart/form-data" method="POST">
+    <input name="csrf_token" type="hidden" value="{{ csrf_token() }}">
+    <input name="file" type="file">
+    <input type="submit" value="Submit">
+</form>
+
 {% endblock %}

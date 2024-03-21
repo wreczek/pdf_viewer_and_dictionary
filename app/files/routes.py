@@ -18,7 +18,7 @@ def file_list():
     return render_template('file_list.html', pdf_files_info=pdf_files_info, active_page='file_list')
 
 
-@files_bp.route('/delete_file/<filename>')
+@files_bp.route('/delete_file/<filename>', methods=['POST'])
 def delete_file(filename):
     result = file_manager.delete_file(filename)
     flash(result['message'], 'success' if 'success' in result else 'danger')

@@ -9,9 +9,9 @@
 <div class="container">
     <h1 class="mb-4">List of Unfamiliar Words</h1>
 
-    <!-- Filter Form -->
     <form action="{{ url_for('unfamiliar_words') }}" class="filter-form" id="filterForm"
           method="post">
+        <input name="csrf_token" type="hidden" value="{{ csrf_token() }}">
         <div class="row">
             <div class="col-md-3 mb-3">
                 <label class="form-label" for="file">Filter by File:</label>

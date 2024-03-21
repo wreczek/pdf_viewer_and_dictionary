@@ -10,7 +10,6 @@
     <meta charset="UTF-8">
     <meta content="width=device-width, initial-scale=1.0" name="viewport">
     <meta content="Your login page description here" name="description">
-    <!-- Add any other meta tags you need -->
 {% endblock %}
 
 {% block content %}
@@ -25,7 +24,7 @@
         {% endif %}
     {% endwith %}
 <form action="{{ url_for('auth.login') }}" method="post">
-        {{ form.csrf_token }}
+    <input name="csrf_token" type="hidden" value="{{ csrf_token() }}">
         {{ form.username.label }} {{ form.username }}
         {{ form.password.label }} {{ form.password }}
         {{ form.submit }}
