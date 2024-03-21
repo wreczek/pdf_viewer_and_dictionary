@@ -108,3 +108,4 @@ if __name__ == "__main__":
 #   6. Add list_words endpoint with pagination
 #   7. Dodac informacje po nieudanym dodawaniu pliku dlaczego (np jpg)
 #   8. Usuwanie plikow z listy Files (i moze jakies inne manipulacje?)
+#   9. zastapic usuwanie przenoszeniem do kosza ...
