@@ -30,6 +30,8 @@ function acceptChanges() {
 function removeWord() {
     // Get the word ID from the modal (data attribute)
     var wordId = document.getElementById('wordDetailsModal').getAttribute('data-word-id');
+    // Assuming you have a way to get the CSRF token:
+    var csrfToken = document.querySelector('meta[name="csrf-token"]').getAttribute('content');
 
     // Log the wordId to the console for debugging
     console.log('Word ID:', wordId);
@@ -40,33 +42,31 @@ function removeWord() {
         return;
     }
 
-    // Assuming you have a Flask route for deleting words, modify the URL accordingly
+    // Flask route for deleting words
     var deleteUrl = `/delete_word/${wordId}`;
 
-    // Use the Fetch API for AJAX
+    // Use the Fetch API for AJAX, including CSRF token in the request headers
     fetch(deleteUrl, {
         method: 'DELETE',
+        headers: {
+            'X-CSRF-Token': csrfToken, // Ensure this header name matches what your server expects
+            'Content-Type': 'application/json'
+        },
+        // You might need to include credentials if cookies are used for session management
+        credentials: 'same-origin'
     })
     .then(response => {
         if (!response.ok) {
             throw new Error('Network response was not ok');
         }
-
-        // Ensure the server response is valid JSON
         return response.json();
     })
     .then(data => {
-    // Ensure data is defined before logging
-    console.log('Word removed successfully:', data);
-
-    // Close the modal using Bootstrap's method
-    $('#wordDetailsModal').modal('hide');
-
-    // Fetch and refresh content after removal
-    fetchAndRefreshContent();
+        console.log('Word removed successfully:', data);
+        $('#wordDetailsModal').modal('hide');
+        fetchAndRefreshContent();
     })
     .catch(error => {
-        // Handle errors (e.g., show an error message)
         console.error('Error removing word:', error);
     });
 }
