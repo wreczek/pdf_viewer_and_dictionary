@@ -107,5 +107,5 @@ if __name__ == "__main__":
 #   5. Dodac Word model, ORM i usuwanie dodawanie etc. przez ten model
 #   6. Add list_words endpoint with pagination
 #   7. Dodac informacje po nieudanym dodawaniu pliku dlaczego (np jpg)
-#   8. Usuwanie plikow z listy Files (i moze jakies inne manipulacje?)
+#   8. Usuwanie plikow z listy Files (i moze jakies inne manipulacje?) np. archive
 #   9. zastapic usuwanie przenoszeniem do kosza ...

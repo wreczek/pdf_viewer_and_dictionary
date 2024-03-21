@@ -1,4 +1,3 @@
-<!-- login.html -->
 {% extends 'bar.html' %}
 
 {% block title %}
@@ -13,20 +12,11 @@
 {% endblock %}
 
 {% block content %}
-    <h1>Login</h1>
-    {% with messages = get_flashed_messages() %}
-        {% if messages %}
-            <ul class="messages">
-                {% for message in messages %}
-                    <li>{{ message }}</li>
-                {% endfor %}
-            </ul>
-        {% endif %}
-    {% endwith %}
+<h1>Login</h1>
 <form action="{{ url_for('auth.login') }}" method="post">
     <input name="csrf_token" type="hidden" value="{{ csrf_token() }}">
-        {{ form.username.label }} {{ form.username }}
-        {{ form.password.label }} {{ form.password }}
-        {{ form.submit }}
-    </form>
+    {{ form.username.label }} {{ form.username }}
+    {{ form.password.label }} {{ form.password }}
+    {{ form.submit }}
+</form>
 {% endblock %}
