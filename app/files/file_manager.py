@@ -1,6 +1,7 @@
 import os
 from datetime import datetime
 
+import send2trash
 from werkzeug.utils import secure_filename
 from win32_setctime import setctime
 
@@ -68,7 +69,7 @@ class FileManager:
         # Check if the file exists and is a file, not a directory
         if os.path.isfile(file_path):
             try:
-                os.remove(file_path)
+                send2trash.send2trash(file_path)  # TODO: Logger
                 return {'message': f'File {filename} deleted successfully!', 'success': True}
             except Exception as e:
                 return {'message': f"Error deleting file: {e}", 'error': True}
