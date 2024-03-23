@@ -20,14 +20,14 @@ def create_app():
     app = Flask(__name__)
     csrf.init_app(app)
 
-    config = load_config()
-    app.config.from_object(config)
+    config_ = load_config()
+    app.config.from_object(config_)
 
     # Application Configuration
     app.config['SECRET_KEY'] = 'your_secret_key'  # Ideally, load from environment variable
     app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///site.db'
-    app.static_folder = config.static_folder
-    app.upload_folder = config.upload_folder
+    app.static_folder = config_.static_folder
+    app.upload_folder = config_.upload_folder
     # app.config['SERVER_NAME'] = '127.0.0.1:5000'  # Add this line
 
     # Initialize extensions with the app object
