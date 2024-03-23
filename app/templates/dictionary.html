@@ -10,7 +10,7 @@
     <h1 class="mb-4">List of Unfamiliar Words</h1>
     <meta content="{{ csrf_token() }}" name="csrf-token">
 
-    <form action="{{ url_for('unfamiliar_words') }}" class="filter-form" id="filterForm"
+    <form action="{{ url_for('words.unfamiliar_words') }}" class="filter-form" id="filterForm"
           method="post">
         <input name="csrf_token" type="hidden" value="{{ csrf_token() }}">
         <div class="row">

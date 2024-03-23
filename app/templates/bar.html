@@ -32,7 +32,7 @@
     </div>
 
     <div>
-        <a href="{{ url_for('unfamiliar_words') }}" {% if active_page == 'unfamiliar_words' %}class="active"{% endif %}>Dictionary</a>
+        <a href="{{ url_for('words.unfamiliar_words') }}" {% if active_page == 'unfamiliar_words' %}class="active"{% endif %}>Dictionary</a>
     </div>
 
     {% if current_user.is_authenticated %}

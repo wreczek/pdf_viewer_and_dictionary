@@ -7,6 +7,7 @@ from app.auth.routes import *
 from app.errors.handlers import *
 from app.files.routes import *
 from app.main.routes import *
+from app.words.routes import *
 from config import load_config
 
 # Initialize extensions without passing the app object
@@ -40,5 +41,6 @@ def create_app():
     app.register_blueprint(main_bp)
     app.register_blueprint(files_bp)
     app.register_blueprint(error_bp)
+    app.register_blueprint(words_bp)
 
     return app
