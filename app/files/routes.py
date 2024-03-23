@@ -27,3 +27,30 @@ def delete_file(filename):
     result = file_manager.delete_file(filename)
     flash(result['message'], 'success' if 'success' in result else 'danger')
     return redirect(url_for('files.file_list'))
+
+
+@files_bp.route('/pdf/<path:filename>')
+def pdf(filename):
+    return send_from_directory(config.upload_folder, filename)
+
+
+@files_bp.route('/file_list/<path:filename>')
+def pdf_viewer(filename):
+    pdf_path = url_for('files.pdf', filename=filename)
+
+    # Retrieve the last stored position from localStorage
+    last_position = request.cookies.get(f'last_position_{filename}')
+
+    # Update access time
+    file_path = os.path.join(config.upload_folder, filename)
+    current_time = datetime.now().timestamp()
+
+    # Update the access time of the file
+    os.utime(file_path, (current_time, current_time))
+
+    return render_template('pdf_viewer.html',
+                           file_name=filename,
+                           current_file=filename,
+                           pdf_path=pdf_path,
+                           last_position=last_position,  # Pass last_position to the template
+                           active_page='pdf_viewer')
