@@ -22,6 +22,12 @@ class FileManager:
         if not self.allowed_file(filename):
             return {'message': 'File type is not allowed.', 'error': True}
 
+        if file.content_length > config.max_size:
+            size = file.content_length
+            return {
+                'message': f'File size exceeds the maximum limit of {self.format_file_size(size)}.',
+                'error': True}
+
         try:
             file_path = os.path.join(self.upload_folder, filename)
             file.save(file_path)
@@ -68,6 +74,18 @@ class FileManager:
                 return {'message': f"Error deleting file: {e}", 'error': True}
         else:
             return {'message': 'File not found or is a directory.', 'error': True}
+
+    @staticmethod
+    def format_file_size(size_bytes):
+        """Formats the file size in a human-readable format using f-strings and a dictionary."""
+        suffixes = ["bytes", "KiB", "MiB", "GiB"]
+        index = 0
+
+        while size_bytes >= 1024 and index < len(suffixes) - 1:
+            size_bytes /= 1024
+            index += 1
+
+        return f"{size_bytes:.1f} {suffixes[index]}"
 
     @staticmethod
     def get_available_files():
