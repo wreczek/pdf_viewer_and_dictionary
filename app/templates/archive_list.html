@@ -1,0 +1,45 @@
+{% extends 'bar.html' %}
+
+{% block title %}
+Archived Files
+{% endblock %}
+
+{% block content %}
+<h1>List of Archived PDFs</h1>
+<table class="my-table">
+    <thead>
+    <tr>
+        <th>File Name</th>
+        <th>Archive Date</th>
+        <th>Status</th>
+        <th>Restore</th>
+        <th>Annihilate</th>
+    </tr>
+    </thead>
+    <tbody>
+    {% for file_info in archived_files_info %}
+    <tr>
+        <td>
+            <a href="/archive_list/{{ file_info['name'] }}">{{ file_info['name'] }}</a>
+        </td>
+        <td>{{ file_info['archive_date'] }}</td>
+        <td>{{ file_info['status'] }}</td>
+        <td>
+            <form action="{{ url_for('files.restore_file', filename=file_info['name']) }}"
+                  method="POST">
+                <input name="csrf_token" type="hidden" value="{{ csrf_token() }}"/>
+                <button class="btn btn-primary" type="submit">Restore</button>
+            </form>
+        </td>
+        <td>
+            <form action="{{ url_for('files.permanently_delete_file', filename=file_info['name']) }}"
+                  method="POST" style="margin-top: 10px;">
+                <input name="csrf_token" type="hidden" value="{{ csrf_token() }}"/>
+                <button class="btn btn-danger" type="submit">Permanently Delete</button>
+            </form>
+        </td>
+    </tr>
+    {% endfor %}
+    </tbody>
+</table>
+{% endblock %}

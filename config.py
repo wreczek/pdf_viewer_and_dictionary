@@ -10,6 +10,9 @@ CONFIG_PATH = os.path.join(BASE_DIR, "env", "main.yaml")
 @dataclass
 class BaseConfig:
     upload_folder: str = field(default=os.path.join(BASE_DIR, 'app', "documents"))
+    metadata_file: str = field(
+        default=os.path.join(BASE_DIR, 'app', "documents", 'file_metadata.json'))
+    archive_folder: str = field(default=os.path.join(BASE_DIR, 'app', "documents", 'archive'))
     static_folder: str = field(default=os.path.join(BASE_DIR, 'static'))
     words_csv_path: str = field(default=os.path.join(BASE_DIR, "db", "familiar_words.csv"))
     max_size: int = field(default=50 * 1024 * 1024)

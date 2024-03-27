@@ -9,7 +9,7 @@ from app.words import word_manager, words_bp, config
 def unfamiliar_words():
     csv_header, word_list = word_manager.read_and_process_csv()
     filtered_and_sorted_word_list = word_manager.apply_filters_and_sort(word_list)
-    available_files = file_manager.get_available_files()
+    available_files = file_manager.get_available_files(config.upload_folder)
 
     return render_template('dictionary.html',
                            filtered_word_list=filtered_and_sorted_word_list,

@@ -1,40 +1,47 @@
 {% extends 'bar.html' %}
 
 {% block title %}
-    Files list
+Files list
 {% endblock %}
 
 {% block content %}
-    <h1>List of Uploaded PDFs</h1>
-    <table class="my-table">
-        <thead>
-            <tr>
-                <th>File Name</th>
-                <th>Upload Date</th>
-                <th>Access Date</th>
-                <th>Status</th>
-                <th>Action</th>
-            </tr>
-        </thead>
-        <tbody>
-            {% for pdf_file_info in pdf_files_info %}
-                <tr>
-                    <td>
-                        <a href="/file_list/{{ pdf_file_info['name'] }}">{{
-                            pdf_file_info['name'] }}</a>
-                    </td>
-                    <td>{{ pdf_file_info['upload_date'] }}</td>
-                    <td>{{ pdf_file_info['access_date'] }}</td>
-                    <td>{{ pdf_file_info['status'] }}</td>
-                    <td>
-                        <form action="{{ url_for('files.delete_file', filename=pdf_file_info['name']) }}"
-                              method="POST">
-                            <input name="csrf_token" type="hidden" value="{{ csrf_token() }}"/>
-                            <button class="btn btn-danger" type="submit">Delete</button>
-                        </form>
-                    </td>
-                </tr>
-            {% endfor %}
-        </tbody>
-    </table>
+<h1>List of Uploaded PDFs</h1>
+<table class="my-table">
+    <thead>
+    <tr>
+        <th>File Name</th>
+        <th>Upload Date</th>
+        <th>Access Date</th>
+        <th>Status</th>
+        <th>Archive</th>
+        <th>Delete</th>
+    </tr>
+    </thead>
+    <tbody>
+    {% for pdf_file_info in pdf_files_info %}
+    <tr>
+        <td>
+            <a href="/file_list/{{ pdf_file_info['name'] }}">{{ pdf_file_info['name'] }}</a>
+        </td>
+        <td>{{ pdf_file_info['upload_date'] }}</td>
+        <td>{{ pdf_file_info['access_date'] }}</td>
+        <td>{{ pdf_file_info['status'] }}</td>
+        <td>
+            <form action="{{ url_for('files.archive_file', filename=pdf_file_info['name']) }}"
+                  method="POST">
+                <input name="csrf_token" type="hidden" value="{{ csrf_token() }}"/>
+                <button class="btn btn-secondary" type="submit">Archive</button>
+            </form>
+        </td>
+        <td>
+            <form action="{{ url_for('files.delete_file', filename=pdf_file_info['name']) }}"
+                  method="POST">
+                <input name="csrf_token" type="hidden" value="{{ csrf_token() }}"/>
+                <button class="btn btn-danger" type="submit">Delete</button>
+            </form>
+        </td>
+    </tr>
+    {% endfor %}
+    </tbody>
+</table>
 {% endblock %}

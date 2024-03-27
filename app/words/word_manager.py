@@ -3,7 +3,7 @@ import csv
 from dateutil.parser import parse
 from flask import request, render_template
 
-from utils import map_difficulty
+from utils import map_difficulty, config
 
 
 class WordManager:
@@ -92,7 +92,7 @@ class WordManager:
     def fetch_updated_content(self, file_manager):
         csv_header, word_list = self.read_and_process_csv()
         filtered_and_sorted_word_list = self.apply_filters_and_sort(word_list)
-        available_files = file_manager.get_available_files()
+        available_files = file_manager.get_available_files(config.upload_folder)
 
         updated_content = render_template('dictionary_table.html',
                                           filtered_word_list=filtered_and_sorted_word_list,

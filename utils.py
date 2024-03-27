@@ -1,6 +1,6 @@
 from config import load_config
 
-config = load_config()
+config = load_config()  # TODO: Czy powinny byc 2 takie miejsca w kodzie?
 
 
 def get_status(file_path):
