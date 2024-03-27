@@ -197,7 +197,7 @@ class FileManager:
         if not os.path.exists(config.metadata_file):
             return "Metadata file not found."
 
-        with open(config.metadata_file) as f:
+        with open(config.metadata_file) as f:  # dodac try catche (bo bez nich to widac jak debbugowalrm ostatnio 2 dni)
             data = json.load(f)
 
         date = data.get(filepath, None)  # TODO: default: None? co zwrocic
