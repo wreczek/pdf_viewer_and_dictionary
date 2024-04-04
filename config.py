@@ -36,8 +36,14 @@ def load_config():
         config_data = yaml.safe_load(config_file)
 
     if env == 'development':
-        return DevelopmentConfig(**config_data)
+        config = DevelopmentConfig(**config_data)
     elif env == 'production':
-        return ProductionConfig(**config_data)
+        config = ProductionConfig(**config_data)
     else:
         raise ValueError(f"Unsupported environment: {env}")
+
+    os.makedirs(config.upload_folder, exist_ok=True)
+    os.makedirs(config.archive_folder, exist_ok=True)
+    os.makedirs(config.static_folder, exist_ok=True)
+
+    return config

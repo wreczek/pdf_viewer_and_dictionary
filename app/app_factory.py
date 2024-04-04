@@ -9,6 +9,7 @@ from app.files.routes import *
 from app.main.routes import *
 from app.words.routes import *
 from config import load_config
+from app.extensions import db
 
 # Initialize extensions without passing the app object
 login_manager = LoginManager()
@@ -32,6 +33,10 @@ def create_app():
 
     # Initialize extensions with the app object
     db.init_app(app)
+
+    with app.app_context():
+        db.create_all()
+
     login_manager.init_app(app)
     migrate.init_app(app, db)
 

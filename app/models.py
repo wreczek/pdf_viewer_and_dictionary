@@ -12,5 +12,8 @@ class User(db.Model, UserMixin):
         self.username = username
         self.password = password
 
+    def __repr__(self):
+        return f"User('{self.username}')"
+
     def get_id(self):
         return str(self.id)
