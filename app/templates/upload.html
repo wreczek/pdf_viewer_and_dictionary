@@ -1,15 +1,12 @@
 {% extends 'bar.html' %}
-
 {% block title %}
     Upload
 {% endblock %}
-
 {% block content %}
 <h1>File Upload</h1>
-<form action="{{ url_for('files.upload_file') }}" enctype="multipart/form-data" method="POST">
+<form action="{{ url_for('files.upload_files') }}" enctype="multipart/form-data" method="POST">
     <input name="csrf_token" type="hidden" value="{{ csrf_token() }}">
-    <input name="file" type="file">
+    <input multiple name="files" type="file">
     <input type="submit" value="Submit">
 </form>
-
 {% endblock %}

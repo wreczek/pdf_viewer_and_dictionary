@@ -6,13 +6,16 @@ from flask import render_template, request, flash, redirect, url_for, send_from_
 from app.files import file_manager, files_bp
 from utils import config
 
+FILE_LIST_ROUTE = 'files.file_list'
+ARCHIVE_LIST_ROUTE = 'files.archive_list'
+
 
 @files_bp.route('/upload', methods=['GET', 'POST'])
-def upload_file():
-    if request.method == 'POST' and 'file' in request.files:
-        result = file_manager.upload_file(request.files['file'])
+def upload_files():
+    if request.method == 'POST' and 'files' in request.files:
+        result = file_manager.upload_files(request.files.getlist('files'))
         flash(result['message'], 'success' if 'success' in result else 'danger')
-        return redirect(request.url if 'error' in result else url_for('files.file_list'))
+        return redirect(request.url if 'error' in result else url_for(FILE_LIST_ROUTE))
     return render_template('upload.html', active_page='upload_file')
 
 
@@ -36,7 +39,7 @@ def archive_list():
 def delete_file(filename):
     result = file_manager.delete_file(filename)
     flash(result['message'], 'success' if 'success' in result else 'danger')
-    return redirect(url_for('files.file_list'))
+    return redirect(url_for(FILE_LIST_ROUTE))
 
 
 @files_bp.route('/permanently_delete_file', methods=['POST'])
@@ -44,7 +47,7 @@ def permanently_delete_file(filename):
     """TODO"""
     result = file_manager.permanently_delete_file(filename)
     flash(result['message'], 'success' if 'success' in result else 'danger')
-    return redirect(url_for('files.archive_list'))
+    return redirect(url_for(ARCHIVE_LIST_ROUTE))
 
 
 @files_bp.route('/archive_file/<filename>', methods=['POST'])
@@ -52,14 +55,14 @@ def archive_file(filename):
     """TODO"""
     result = file_manager.archive_file(filename)
     flash(result['message'], 'success' if 'success' in result else 'danger')
-    return redirect(url_for('files.archive_list'))
+    return redirect(url_for(ARCHIVE_LIST_ROUTE))
 
 
 @files_bp.route('/restore_file/<filename>', methods=['POST'])
 def restore_file(filename):
     result = file_manager.restore_file(filename)
     flash(result['message'], 'success' if 'success' in result else 'danger')
-    return redirect(url_for('files.file_list'))
+    return redirect(url_for(FILE_LIST_ROUTE))
 
 
 @files_bp.route('/pdf/<path:filename>')

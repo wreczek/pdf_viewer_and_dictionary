@@ -1,4 +1,5 @@
 import json
+import logging
 import os
 import shutil
 from datetime import datetime
@@ -11,34 +12,42 @@ from utils import config, get_status
 
 ALLOWED_EXTENSIONS = {'txt', 'pdf'}
 
+logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s')
+
 
 class FileManager:
     def __init__(self, upload_folder, archive_folder):
         self.upload_folder = upload_folder
         self.archive_folder = archive_folder
+        self.not_found_msg = 'File not found or is a directory.'
 
-    def upload_file(self, file):
-        """Uploads a file to the designated upload folder."""
-        if file.filename == '':
-            return {'message': 'No selected file.', 'error': True}
-
-        filename = secure_filename(file.filename)
-        if not self.allowed_file(filename):
-            return {'message': 'File type is not allowed.', 'error': True}
-
-        if file.content_length > config.max_size:
-            size = file.content_length
-            return {
-                'message': f'File size exceeds the maximum limit of {self.format_file_size(size)}.',
-                'error': True}
-
-        try:
-            file_path = os.path.join(self.upload_folder, filename)
-            file.save(file_path)
-            self.update_file_creation_date(file_path)
-            return {'message': 'File successfully uploaded!', 'success': True}
-        except Exception as e:
-            return {'message': f"Error uploading file: {e}", 'error': True}
+    def upload_files(self, files):
+        """Uploads multiple files to the designated upload folder."""
+        uploaded_files = []
+        for file in files:
+            if file.filename == '':
+                continue
+            filename = secure_filename(file.filename)
+            if not self.allowed_file(filename):
+                return {'message': f'File type of {filename} is not allowed.', 'error': True}
+            if file.content_length > config.max_size:
+                size = file.content_length
+                return {
+                    'message': f'File size of {filename} exceeds the maximum limit of {self.format_file_size(size)}.',
+                    'error': True}
+            try:
+                file_path = os.path.join(self.upload_folder, filename)
+                file.save(file_path)
+                self.update_file_creation_date(file_path)
+                uploaded_files.append(filename)
+                logging.info(f'File {filename} uploaded successfully.')
+            except Exception as e:
+                logging.error(f'Error uploading file {filename}: {e}')
+                return {'message': f"Error uploading file {filename}: {e}", 'error': True}
+        if uploaded_files:
+            return {'message': f"Files successfully uploaded: {', '.join(uploaded_files)}", 'success': True}
+        else:
+            return {'message': 'No files were uploaded.', 'error': True}
 
     @staticmethod
     def update_file_creation_date(file_path):
@@ -52,7 +61,6 @@ class FileManager:
         return files_info
 
     def list_archived_files(self):
-        """TODO"""
         files_info = self.list_files(path=self.archive_folder)
         files_info.sort(key=lambda x: x['archive_date'], reverse=True)
         return files_info
@@ -80,18 +88,22 @@ class FileManager:
         """Deletes a file from the upload folder after ensuring it is a PDF and not a directory."""
         filename = secure_filename(filename)
         if not filename.lower().endswith('.pdf'):
+            logging.warning(f'Attempted to delete a non-PDF file: {filename}')
             return {'message': 'Only PDF files can be deleted.', 'error': True}
 
         file_path = os.path.join(self.upload_folder, filename)
 
         if os.path.isfile(file_path):
             try:
-                send2trash.send2trash(file_path)  # TODO: Logger
+                send2trash.send2trash(file_path)
+                logging.info(f'File {filename} deleted successfully.')
                 return {'message': f'File {filename} deleted successfully!', 'success': True}
             except Exception as e:
+                logging.error(f'Error deleting file {filename}: {e}')
                 return {'message': f"Error deleting file: {e}", 'error': True}
         else:
-            return {'message': 'File not found or is a directory.', 'error': True}
+            logging.warning(f'File not found: {filename}')
+            return {'message': self.not_found_msg, 'error': True}
 
     def permanently_delete_file(self, filename):
         """todo"""
@@ -103,49 +115,70 @@ class FileManager:
 
         if os.path.isfile(file_path):
             try:
-                os.remove(file_path)  # TODO: Logger
+                os.remove(file_path)
+                logging.info(f'File {filename} permanently deleted successfully.')
                 return {'message': f'File {filename} deleted successfully!', 'success': True}
             except Exception as e:
+                logging.error(f'Error permanently deleting file {filename}: {e}')
                 return {'message': f"Error deleting file: {e}", 'error': True}
         else:
-            return {'message': 'File not found or is a directory.', 'error': True}
+            return {'message': self.not_found_msg, 'error': True}
 
     def archive_file(self, filename):
-        """todo"""
+        """
+        Archives a PDF file by moving it from the upload folder to the archive folder.
+
+        Args:
+            filename (str): The name of the file to be archived.
+        Returns:
+            dict: A dictionary containing the status message and success/error indicator.
+        """
         filename = secure_filename(filename)
         if not filename.lower().endswith('.pdf'):
             return {'message': 'Only PDF files can be archived.', 'error': True}
 
         file_path = os.path.join(self.upload_folder, filename)
         new_path = os.path.join(self.archive_folder, filename)
+
+        if os.path.isfile(new_path):
+            return {'message': f"File {filename} already exists in the archive.", 'error': True}
+
         if os.path.isfile(file_path):
             try:
                 shutil.move(file_path, new_path)
                 self.write_archive_date(new_path, datetime.now())
-                # TODO:
+                logging.info(f"File {filename} archived successfully.")
                 return {'message': f'File {filename} archived successfully!', 'success': True}
-            except Exception as e:
+            except (IOError, OSError) as e:
+                logging.error(f"Error archiving file {filename}: {e}")
                 return {'message': f"Error archiving file: {e}", 'error': True}
         else:
-            return {'message': 'File not found or is a directory.', 'error': True}
+            logger.warning(f"File not found: {filename}")
+            return {'message': self.not_found_msg, 'error': True}
 
     def restore_file(self, filename):
-        """TODO"""
+        """Restores a PDF file by moving it from the archive folder back to the upload folder.
+        Returns a dictionary with the operation result."""
         filename = secure_filename(filename)
         if not filename.lower().endswith('.pdf'):
             return {'message': 'Only PDF files can be restored.', 'error': True}
 
         file_path = os.path.join(self.archive_folder, filename)
         new_path = os.path.join(self.upload_folder, filename)
+
+        if os.path.isfile(new_path):
+            return {'message': f"File {filename} already exists in the upload folder.", 'error': True}
+
         if os.path.isfile(file_path):
             try:
                 shutil.move(file_path, new_path)
+                logging.info(f"File {filename} restored successfully.")
                 return {'message': f'File {filename} restored successfully!', 'success': True}
-            except Exception as e:
+            except (IOError, OSError) as e:
+                logging.error(f"Error restoring file {filename}: {e}")
                 return {'message': f"Error restoring file: {e}", 'error': True}
         else:
-            return {'message': 'File not found or is a directory.', 'error': True}
-
+            return {'message': self.not_found_msg, 'error': True}
     @staticmethod
     def format_file_size(size_bytes):
         """Formats the file size in a human-readable format using f-strings and a dictionary."""
