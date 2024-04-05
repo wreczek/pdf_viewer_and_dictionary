@@ -14,11 +14,10 @@ if __name__ == "__main__":
     app.run(debug=True)
 
 #  TODO:
-#   1. dodac archiwum? tam trafiaja usuniete slowa, a z archiwum mozna je juz usunac na zawsze
-#   2. details button - dodac funkcjonalnosc z planu
-#   3. być może apply filter nie powinien odświeżać całej strony tylko samą tabelkę?
-#   4. ogarnac zmiany z 3 commitami wstecz (slim vs no slim, czemu nie dziala, co powinno dzialac)
+#   1. details button - dodac funkcjonalnosc z planu
+#   2. być może apply filter nie powinien odświeżać całej strony tylko samą tabelkę?
+#   3. ogarnac zmiany z 3 commitami wstecz (slim vs no slim, czemu nie dziala, co powinno dzialac)
 #       commit 47e...
-#   5. Dodac Word model, ORM i usuwanie dodawanie etc. przez ten model
-#   6. Add list_words endpoint with pagination
-#   7. Usuwanie plikow z listy Files (i moze jakies inne manipulacje?) np. archive
+#   4. Dodac Word model, ORM i usuwanie dodawanie etc. przez ten model
+#   5. Add list_words endpoint with pagination
+#   6. Usuwanie plikow z listy Files (i moze jakies inne manipulacje?) np. archive
