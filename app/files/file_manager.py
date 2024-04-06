@@ -153,7 +153,7 @@ class FileManager:
                 logging.error(f"Error archiving file {filename}: {e}")
                 return {'message': f"Error archiving file: {e}", 'error': True}
         else:
-            logger.warning(f"File not found: {filename}")
+            logging.warning(f"File not found: {filename}")
             return {'message': self.not_found_msg, 'error': True}
 
     def restore_file(self, filename):
@@ -179,6 +179,7 @@ class FileManager:
                 return {'message': f"Error restoring file: {e}", 'error': True}
         else:
             return {'message': self.not_found_msg, 'error': True}
+
     @staticmethod
     def format_file_size(size_bytes):
         """Formats the file size in a human-readable format using f-strings and a dictionary."""

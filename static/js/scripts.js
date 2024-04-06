@@ -13,7 +13,6 @@ function showWordDetails(word, translation, book, date, difficulty, wordId) {
 
     // Show the modal using Bootstrap's method
     $('#wordDetailsModal').modal('show');
-
 }
 
 function acceptChanges() {
@@ -24,14 +23,13 @@ function acceptChanges() {
 
     // Close the modal using Bootstrap's method
     $('#wordDetailsModal').modal('hide');
-
 }
 
 function removeWord() {
     // Get the word ID from the modal (data attribute)
-    var wordId = document.getElementById('wordDetailsModal').getAttribute('data-word-id');
+    let wordId = document.getElementById('wordDetailsModal').getAttribute('data-word-id');
     // Assuming you have a way to get the CSRF token:
-    var csrfToken = document.querySelector('meta[name="csrf-token"]').getAttribute('content');
+    let csrfToken = document.querySelector('meta[name="csrf-token"]').getAttribute('content');
 
     // Log the wordId to the console for debugging
     console.log('Word ID:', wordId);
@@ -43,7 +41,7 @@ function removeWord() {
     }
 
     // Flask route for deleting words
-    var deleteUrl = `/delete_word/${wordId}`;
+    let deleteUrl = `/delete_word/${wordId}`;
 
     // Use the Fetch API for AJAX, including CSRF token in the request headers
     fetch(deleteUrl, {
@@ -76,7 +74,7 @@ async function fetchAndRefreshContent() {
     // Log message before the fetch request
     console.log('Fetching and refreshing content...');
 
-  try {
+    try {
     const response = await fetch('/get_updated_content');
     const data = await response.json();
 
@@ -84,9 +82,10 @@ async function fetchAndRefreshContent() {
 
     // Assuming 'content-container' is the container where you want to update the HTML
     document.getElementById('refreshedContent').innerHTML = data.html;
-  } catch (error) {
-    console.error('Error fetching data:', error);
-  }
+    }
+    catch (error) {
+        console.error('Error fetching data:', error);
+    }
 }
 
 // Set an interval to fetch and refresh content every 5 seconds (adjust as needed)
@@ -101,7 +100,7 @@ function setLastPosition(lastPosition, currentFile) {
 
     // Save the scroll position on window unload
     window.addEventListener('beforeunload', function () {
-        var scrollPosition = document.getElementById('pdfViewer').contentWindow.scrollY;
+        let scrollPosition = document.getElementById('pdfViewer').contentWindow.scrollY;
         document.cookie = `last_position_${currentFile}=${scrollPosition}`;
     });
 }
