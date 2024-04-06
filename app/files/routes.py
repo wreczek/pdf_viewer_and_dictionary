@@ -114,6 +114,10 @@ def perform_batch_operation():
             result = file_manager.archive_file(filename)
         elif operation == 'delete':
             result = file_manager.delete_file(filename)
+        elif operation == "restore":
+            result = file_manager.restore_file(filename)
+        elif operation == "annihilate":
+            result = file_manager.permanently_delete_file(filename)
         else:
             return jsonify({'success': False, 'message': 'Invalid operation.'})
         results.append(result)
