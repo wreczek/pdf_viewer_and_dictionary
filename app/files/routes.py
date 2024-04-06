@@ -1,7 +1,8 @@
+import json
 import os
 from datetime import datetime
 
-from flask import render_template, request, flash, redirect, url_for, send_from_directory
+from flask import render_template, request, flash, redirect, url_for, send_from_directory, jsonify
 
 from app.files import file_manager, files_bp
 from utils import config
@@ -90,3 +91,31 @@ def pdf_viewer(filename):
                            pdf_path=pdf_path,
                            last_position=last_position,  # Pass last_position to the template
                            active_page='pdf_viewer')
+
+
+@files_bp.route('/perform_batch_operation', methods=['POST'])
+def perform_batch_operation():
+    filenames = request.form.get('filenames')
+    operation = request.form.get('operation')
+
+    if not filenames:
+        return jsonify({'success': False, 'message': 'No files selected.'})
+
+    try:
+        filenames = json.loads(filenames)
+    except ValueError:
+        return jsonify({'success': False, 'message': 'Invalid file list.'})
+
+    print(filenames)
+
+    results = []
+    for filename in filenames:
+        if operation == 'archive':
+            result = file_manager.archive_file(filename)
+        elif operation == 'delete':
+            result = file_manager.delete_file(filename)
+        else:
+            return jsonify({'success': False, 'message': 'Invalid operation.'})
+        results.append(result)
+
+    return jsonify({'success': True, 'results': results})

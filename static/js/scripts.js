@@ -108,3 +108,14 @@ function setLastPosition(lastPosition, currentFile) {
 
 // Use the function to set the last position when the page loads
 setLastPosition("{{ last_position }}", "{{ current_file }}");
+
+function selectAllCheckboxes(selectAllCheckbox) {
+    const allCheckboxes = document.querySelectorAll('.file-checkbox');
+    allCheckboxes.forEach(checkbox => {
+        checkbox.checked = selectAllCheckbox.checked;
+    });
+}
+
+function getSelectedFileNames() {
+    return Array.from(document.querySelectorAll('.file-checkbox:checked')).map(cb => cb.value);
+}
