@@ -1,3 +1,4 @@
+import logging
 from sqlite3 import IntegrityError
 
 from flask import render_template, url_for, flash, redirect, request
@@ -9,11 +10,15 @@ from app.extensions import db
 from app.models import User
 from . import auth_bp
 
+HOME_PAGE = 'main.index'
+
+logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s')
+
 
 @auth_bp.route("/register", methods=['GET', 'POST'])
 def register():
     if current_user.is_authenticated:
-        return redirect(url_for('main.index'))
+        return redirect(url_for(HOME_PAGE))
     form = RegistrationForm()
     if form.validate_on_submit():
         existing_user = User.query.filter_by(username=form.username.data).first()
@@ -31,14 +36,14 @@ def register():
         except IntegrityError as e:
             db.session.rollback()
             flash('Username already taken. Please choose a different one.', 'danger')
-            # app.logger.error(f'Error: {e}')  # TODO: dodac logging
+            logging.error(f'Error: {e}')
     return render_template('register.html', title='Register', form=form)
 
 
 @auth_bp.route("/login", methods=['GET', 'POST'])
 def login():
     if current_user.is_authenticated:
-        return redirect(url_for('main.index'))
+        return redirect(url_for(HOME_PAGE))
     form = LoginForm()
     if form.validate_on_submit():
         user = User.query.filter_by(username=form.username.data).first()
@@ -48,6 +53,7 @@ def login():
             return redirect(next_page) if next_page else redirect(url_for('main.dashboard'))
         else:
             flash('Login Unsuccessful. Please check username and password', 'danger')
+            logging.error(f'Login for {current_user} unsuccessful.')
     return render_template('login.html', title='Login', form=form)
 
 
@@ -56,4 +62,4 @@ def login():
 def logout():
     logout_user()
     flash('Logout successful!', 'success')
-    return redirect(url_for('main.index'))
+    return redirect(url_for(HOME_PAGE))

@@ -20,3 +20,4 @@ if __name__ == "__main__":
 #       commit 47e...
 #   4. Dodac Word model, ORM i usuwanie dodawanie etc. przez ten model
 #   5. Add list_words endpoint with pagination
+#   6. posprzatac nazewnictwo endpointow i sciezek (uploaded_list, pdf_viewer, ... etc)
