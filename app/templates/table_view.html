@@ -1,0 +1,61 @@
+{% macro render_table(table_id, files_info, actions) %}
+<script src="{{ url_for('static', filename='js/checkbox_clearing.js') }}"></script>
+<script src="{{ url_for('static', filename='js/batch_operations.js') }}"></script>
+<script src="{{ url_for('static', filename='js/clicked_checkbox_tracker.js') }}"></script>
+<script src="{{ url_for('static', filename='js/file_selection.js') }}"></script>
+
+<h1>{{ table_id|capitalize }} PDFs</h1>
+
+<div>
+    {% for action in actions %}
+    <button class="btn btn-{{ action.class }}" onclick="performBatchOperation('{{ action.operation }}')" type="button">
+        {{ action.label }}
+    </button>
+    {% endfor %}
+</div>
+
+<table class="my-table">
+    <caption>List of {{ table_id }} PDF Files</caption>
+    <thead>
+    <tr>
+        <th><input id="selectAll" onclick="selectAllCheckboxes(this)" type="checkbox"></th>
+        <th>File Name</th>
+        {% if table_id == 'uploaded' %}
+        <th>Upload Date</th>
+        <th>Access Date</th>
+        {% else %}
+        <th>Archive Date</th>
+        {% endif %}
+        <th>Status</th>
+        {% for action in actions %}
+        <th>{{ action.th }}</th>
+        {% endfor %}
+    </tr>
+    </thead>
+    <tbody>
+    {% for file_info in files_info %}
+    <tr>
+        <td><input class="file-checkbox" type="checkbox" value="{{ file_info['name'] }}"></td>
+        <td>
+            <a href="/{{ table_id }}_list/{{ file_info['name'] }}">{{ file_info['name'] }}</a>
+        </td>
+        {% if table_id == 'uploaded' %}
+        <td>{{ file_info['upload_date'] }}</td>
+        <td>{{ file_info['access_date'] }}</td>
+        {% else %}
+        <td>{{ file_info['archive_date'] }}</td>
+        {% endif %}
+        <td>{{ file_info['status'] }}</td>
+        {% for action in actions %}
+        <td>
+            <form action="{{ url_for(action.url, filename=file_info['name']) }}" method="POST">
+                <input name="csrf_token" type="hidden" value="{{ csrf_token() }}"/>
+                <button class="btn btn-{{ action.class }}" type="submit">{{ action.button }}</button>
+            </form>
+        </td>
+        {% endfor %}
+    </tr>
+    {% endfor %}
+    </tbody>
+</table>
+{% endmacro %}

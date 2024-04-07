@@ -1,5 +1,7 @@
 {% extends 'bar.html' %}
 
+{% from "table_view.html" import render_table %}
+
 {% block title %}
 Files list
 {% endblock %}
@@ -9,55 +11,8 @@ Files list
 {% endblock %}
 
 {% block content %}
-<script src="{{ url_for('static', filename='js/checkbox_clearing.js') }}"></script>
-<script src="{{ url_for('static', filename='js/batch_operations.js') }}"></script>
-<script src="{{ url_for('static', filename='js/clicked_checkbox_tracker.js') }}"></script>
-<script src="{{ url_for('static', filename='js/file_selection.js') }}"></script>
-
-<h1>List of Uploaded PDFs</h1>
-
-<div>
-    <button class="btn btn-secondary" onclick="performBatchOperation('archive')" type="button">Archive Selected</button>
-    <button class="btn btn-danger" onclick="performBatchOperation('delete')" type="button">Delete Selected</button>
-</div>
-
-<table class="my-table">
-    <caption>List of PDF Files</caption>
-    <thead>
-    <tr>
-        <th><input id="selectAll" onclick="selectAllCheckboxes(this)" type="checkbox"></th>
-        <th>File Name</th>
-        <th>Upload Date</th>
-        <th>Access Date</th>
-        <th>Status</th>
-        <th>Archive</th>
-        <th>Delete</th>
-    </tr>
-    </thead>
-    <tbody>
-    {% for pdf_file_info in pdf_files_info %}
-    <tr>
-        <td><input class="file-checkbox" type="checkbox" value="{{ pdf_file_info['name'] }}"></td>
-        <td>
-            <a href="/file_list/{{ pdf_file_info['name'] }}">{{ pdf_file_info['name'] }}</a>
-        </td>
-        <td>{{ pdf_file_info['upload_date'] }}</td>
-        <td>{{ pdf_file_info['access_date'] }}</td>
-        <td>{{ pdf_file_info['status'] }}</td>
-        <td>
-            <form action="{{ url_for('files.archive_file', filename=pdf_file_info['name']) }}" method="POST">
-                <input name="csrf_token" type="hidden" value="{{ csrf_token() }}"/>
-                <button class="btn btn-secondary" type="submit">Archive</button>
-            </form>
-        </td>
-        <td>
-            <form action="{{ url_for('files.delete_file', filename=pdf_file_info['name']) }}" method="POST">
-                <input name="csrf_token" type="hidden" value="{{ csrf_token() }}"/>
-                <button class="btn btn-danger" type="submit">Delete</button>
-            </form>
-        </td>
-    </tr>
-    {% endfor %}
-    </tbody>
-</table>
+{{ render_table('uploaded', pdf_files_info, actions=[
+{'operation': 'archive', 'label': 'Archive Selected', 'class': 'secondary', 'url': 'files.archive_file', 'button': 'Archive', 'th': 'Archive'},
+{'operation': 'delete', 'label': 'Delete Selected', 'class': 'danger', 'url': 'files.delete_file', 'button': 'Delete', 'th': 'Delete'}
+]) }}
 {% endblock %}

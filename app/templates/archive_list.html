@@ -1,5 +1,7 @@
 {% extends 'bar.html' %}
 
+{% from "table_view.html" import render_table %}
+
 {% block title %}
 Archived Files
 {% endblock %}
@@ -9,54 +11,8 @@ Archived Files
 {% endblock %}
 
 {% block content %}
-<script src="{{ url_for('static', filename='js/checkbox_clearing.js') }}"></script>
-<script src="{{ url_for('static', filename='js/batch_operations.js') }}"></script>
-<script src="{{ url_for('static', filename='js/clicked_checkbox_tracker.js') }}"></script>
-<script src="{{ url_for('static', filename='js/file_selection.js') }}"></script>
-
-<h1>List of Archived PDFs</h1>
-
-<div>
-    <button class="btn btn-primary" onclick="performBatchOperation('restore')" type="button">Restore Selected</button>
-    <button class="btn btn-danger" onclick="performBatchOperation('annihilate')" type="button">REMOVE Selected</button>
-</div>
-
-<table class="my-table">
-    <caption>List of Archived PDF Files</caption>
-    <thead>
-    <tr>
-        <th><input id="selectAll" onclick="selectAllCheckboxes(this)" type="checkbox"></th>
-        <th>File Name</th>
-        <th>Archive Date</th>
-        <th>Status</th>
-        <th>Restore</th>
-        <th>Annihilate</th>
-    </tr>
-    </thead>
-    <tbody>
-    {% for archived_file_info in archived_files_info %}
-    <tr>
-        <td><input class="file-checkbox" type="checkbox" value="{{ archived_file_info['name'] }}"></td>
-        <td>
-            <a href="/archive_list/{{ archived_file_info['name'] }}">{{ archived_file_info['name'] }}</a>
-        </td>
-        <td>{{ archived_file_info['archive_date'] }}</td>
-        <td>{{ archived_file_info['status'] }}</td>
-        <td>
-            <form action="{{ url_for('files.restore_file', filename=archived_file_info['name']) }}" method="POST">
-                <input name="csrf_token" type="hidden" value="{{ csrf_token() }}"/>
-                <button class="btn btn-primary" type="submit">Restore</button>
-            </form>
-        </td>
-        <td>
-            <form action="{{ url_for('files.permanently_delete_file', filename=archived_file_info['name']) }}"
-                  method="POST">
-                <input name="csrf_token" type="hidden" value="{{ csrf_token() }}"/>
-                <button class="btn btn-danger" type="submit">Permanently Delete</button>
-            </form>
-        </td>
-    </tr>
-    {% endfor %}
-    </tbody>
-</table>
+{{ render_table('archived', archived_files_info, actions=[
+{'operation': 'restore', 'label': 'Restore Selected', 'class': 'primary', 'url': 'files.restore_file', 'button': 'Restore', 'th': 'Restore'},
+{'operation': 'annihilate', 'label': 'REMOVE Selected', 'class': 'danger', 'url': 'files.permanently_delete_file', 'button': 'Permanently Delete', 'th': 'Annihilate'}
+]) }}
 {% endblock %}
