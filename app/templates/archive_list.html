@@ -7,13 +7,14 @@ Archived Files
 {% block content %}
 <script src="{{ url_for('static', filename='js/checkbox_clearing.js') }}"></script>
 <script src="{{ url_for('static', filename='js/batch_operations.js') }}"></script>
+<script src="{{ url_for('static', filename='js/clicked_checkbox_tracker.js') }}"></script>
+<script src="{{ url_for('static', filename='js/file_selection.js') }}"></script>
 
 <h1>List of Archived PDFs</h1>
 
 <div>
     <button class="btn btn-primary" onclick="performBatchOperation('restore')" type="button">Restore Selected</button>
     <button class="btn btn-danger" onclick="performBatchOperation('annihilate')" type="button">REMOVE Selected</button>
-    <script src="{{ url_for('static', filename='js/clicked_checkbox_tracker.js') }}"></script>
 </div>
 
 <table class="my-table">

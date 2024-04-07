@@ -20,6 +20,5 @@ if __name__ == "__main__":
 #       commit 47e...
 #   4. Dodac Word model, ORM i usuwanie dodawanie etc. przez ten model
 #   5. Add list_words endpoint with pagination
-#   6. Usuwanie plikow z listy Files (i moze jakies inne manipulacje?) np. archive
-#   7. Rozdzielic czesc wspolna file_list.html i archive_list.html
-#   8. Rozbic jsa na mniejsze pliki (moze css tez?) + wtedy rozdzielic w bar.html ktore importowac a ktore w poszczegolnych htmlach
+#   6. Rozdzielic czesc wspolna file_list.html i archive_list.html
+#   7. Rozbic jsa na mniejsze pliki (moze css tez?) + wtedy rozdzielic w bar.html ktore importowac a ktore w poszczegolnych htmlach

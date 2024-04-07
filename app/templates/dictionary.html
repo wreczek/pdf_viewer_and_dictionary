@@ -2,10 +2,13 @@
 {% extends 'bar.html' %}
 
 {% block title %}
-    Dictionary
+Dictionary
 {% endblock %}
 
 {% block content %}
+<script src="{{ url_for('static', filename='js/fetch_content.js') }}"></script>
+<script src="{{ url_for('static', filename='js/word_details.js') }}"></script>
+
 <div class="container">
     <h1 class="mb-4">List of Unfamiliar Words</h1>
     <meta content="{{ csrf_token() }}" name="csrf-token">
@@ -19,7 +22,7 @@
                 <select class="form-select" id="file" name="file">
                     <option value="">All</option>
                     {% for file in available_files %}
-                        <option value="{{ file }}">{{ file }}</option>
+                    <option value="{{ file }}">{{ file }}</option>
                     {% endfor %}
                 </select>
             </div>
@@ -44,7 +47,7 @@
                 <select class="form-select" id="sort_by" name="sort_by">
                     <option value="-1">None</option>
                     {% for column in csv_header[:-1] %}
-                        <option value="{{ loop.index0 }}">{{ column }}</option>
+                    <option value="{{ loop.index0 }}">{{ column }}</option>
                     {% endfor %}
                 </select>
             </div>
@@ -88,6 +91,4 @@
     </div>
 
 </div>
-
-<script src="{{ url_for('static', filename='js/scripts.js') }}"></script>
 {% endblock %}

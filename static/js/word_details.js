@@ -15,6 +15,7 @@ function showWordDetails(word, translation, book, date, difficulty, wordId) {
     $('#wordDetailsModal').modal('show');
 }
 
+
 function acceptChanges() {
     // Implement logic to accept changes (update the record in the database)
     // You can use AJAX to send a request to the server
@@ -24,6 +25,7 @@ function acceptChanges() {
     // Close the modal using Bootstrap's method
     $('#wordDetailsModal').modal('hide');
 }
+
 
 function removeWord() {
     // Get the word ID from the modal (data attribute)
@@ -67,54 +69,4 @@ function removeWord() {
     .catch(error => {
         console.error('Error removing word:', error);
     });
-}
-
-// Assuming this function is called to fetch and update content
-async function fetchAndRefreshContent() {
-    // Log message before the fetch request
-    console.log('Fetching and refreshing content...');
-
-    try {
-    const response = await fetch('/get_updated_content');
-    const data = await response.json();
-
-    console.log('Content fetched and refreshed successfully:', data);
-
-    // Assuming 'content-container' is the container where you want to update the HTML
-    document.getElementById('refreshedContent').innerHTML = data.html;
-    }
-    catch (error) {
-        console.error('Error fetching data:', error);
-    }
-}
-
-// Set an interval to fetch and refresh content every 5 seconds (adjust as needed)
-//setInterval(fetchAndRefreshContent, 10000);
-
-// Function to set the last position for the PDF viewer
-function setLastPosition(lastPosition, currentFile) {
-    // Set the last position if available
-    if (lastPosition) {
-        document.getElementById('pdfViewer').contentWindow.scrollTo(0, lastPosition);
-    }
-
-    // Save the scroll position on window unload
-    window.addEventListener('beforeunload', function () {
-        let scrollPosition = document.getElementById('pdfViewer').contentWindow.scrollY;
-        document.cookie = `last_position_${currentFile}=${scrollPosition}`;
-    });
-}
-
-// Use the function to set the last position when the page loads
-setLastPosition("{{ last_position }}", "{{ current_file }}");
-
-function selectAllCheckboxes(selectAllCheckbox) {
-    const allCheckboxes = document.querySelectorAll('.file-checkbox');
-    allCheckboxes.forEach(checkbox => {
-        checkbox.checked = selectAllCheckbox.checked;
-    });
-}
-
-function getSelectedFileNames() {
-    return Array.from(document.querySelectorAll('.file-checkbox:checked')).map(cb => cb.value);
 }
