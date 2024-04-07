@@ -71,7 +71,7 @@ def pdf(filename):
     return send_from_directory(config.upload_folder, filename)
 
 
-@files_bp.route('/file_list/<path:filename>')
+@files_bp.route('/uploaded_list/<path:filename>')
 def pdf_viewer(filename):
     pdf_path = url_for('files.pdf', filename=filename)
 
