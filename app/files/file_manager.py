@@ -12,7 +12,7 @@ from utils import config, get_status
 
 ALLOWED_EXTENSIONS = {'txt', 'pdf'}
 
-logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s')
+logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(name)s - %(levelname)s - %(message)s')
 
 
 class FileManager:
@@ -21,6 +21,47 @@ class FileManager:
         self.archive_folder = archive_folder
         self.not_found_msg = 'File not found or is a directory.'
 
+    def get_file_path(self, filename: str, folder_type: str) -> str:
+        """
+        Constructs a file path based on the filename and folder type.
+
+        Args:
+            filename (str): The name of the file.
+            folder_type (str): The type of folder ('upload' or 'archive') to construct the path for.
+
+        Returns:
+            str: The constructed file path.
+        """
+        base_path = self.upload_folder if folder_type == 'upload' else self.archive_folder
+        secure_name = secure_filename(filename)
+        final_path = os.path.join(base_path, secure_name)
+        # Ensure the final path is within the intended directory
+        if os.path.commonpath([final_path, base_path]) != os.path.normpath(base_path):
+            raise ValueError("Invalid file path. Potential directory traversal attempt detected.")
+        return final_path
+
+    @staticmethod
+    def validate_file_for_operation(filename: str, operation: str) -> (bool, str):
+        """
+        Validates the file for the specified operation.
+
+        Args:
+            filename (str): The name of the file to validate.
+            operation (str): The operation to validate against. Valid operations are 'upload', 'delete', 'archive', and 'restore'.
+
+        Returns:
+            (bool, str): A tuple where the first element is a boolean indicating if the file is valid for the operation, and the second element is an error message in case of validation failure.
+        """
+        # Check for allowed file type
+        if '.' not in filename or filename.rsplit('.', 1)[1].lower() not in ALLOWED_EXTENSIONS:
+            return False, f"File type of {filename} is not allowed."
+
+        # Operation-specific validations
+        if operation in ['delete', 'archive', 'restore'] and not filename.lower().endswith('.pdf'):
+            return False, "Only PDF files can be processed for this operation."
+
+        return True, ""
+
     def upload_files(self, files):
         """Uploads multiple files to the designated upload folder."""
         uploaded_files = []
@@ -28,15 +69,21 @@ class FileManager:
             if file.filename == '':
                 continue
             filename = secure_filename(file.filename)
-            if not self.allowed_file(filename):
-                return {'message': f'File type of {filename} is not allowed.', 'error': True}
+
+            # Use the new validation method
+            is_valid, error_message = self.validate_file_for_operation(file.filename, 'upload')
+            if not is_valid:
+                return {'message': error_message, 'error': True}
+
+            # Size check remains here as it's specific to uploads
             if file.content_length > config.max_size:
                 size = file.content_length
                 return {
-                    'message': f'File size of {filename} exceeds the maximum limit of {self.format_file_size(size)}.',
+                    'message': f'File size of {file.filename} exceeds the maximum limit of {self.format_file_size(size)}.',
                     'error': True}
+
             try:
-                file_path = os.path.join(self.upload_folder, filename)
+                file_path = self.get_file_path(filename, "upload")
                 file.save(file_path)
                 self.update_file_creation_date(file_path)
                 uploaded_files.append(filename)
@@ -87,12 +134,11 @@ class FileManager:
     def delete_file(self, filename):
         """Deletes a file from the upload folder after ensuring it is a PDF and not a directory."""
         filename = secure_filename(filename)
-        if not filename.lower().endswith('.pdf'):
-            logging.warning(f'Attempted to delete a non-PDF file: {filename}')
-            return {'message': 'Only PDF files can be deleted.', 'error': True}
+        is_valid, error_message = self.validate_file_for_operation(filename, 'delete')
+        if not is_valid:
+            return {'message': error_message, 'error': True}
 
-        file_path = os.path.join(self.upload_folder, filename)
-
+        file_path = self.get_file_path(filename, 'upload')
         if os.path.isfile(file_path):
             try:
                 send2trash.send2trash(file_path)
@@ -108,10 +154,12 @@ class FileManager:
     def permanently_delete_file(self, filename):
         """todo"""
         filename = secure_filename(filename)
-        if not filename.lower().endswith('.pdf'):
-            return {'message': 'Only PDF files can be (permanently) deleted.', 'error': True}
 
-        file_path = os.path.join(self.archive_folder, filename)
+        is_valid, error_message = self.validate_file_for_operation(filename, 'archive')
+        if not is_valid:
+            return {'message': error_message, 'error': True}
+
+        file_path = self.get_file_path(filename, 'archive')
 
         if os.path.isfile(file_path):
             try:
@@ -134,18 +182,20 @@ class FileManager:
             dict: A dictionary containing the status message and success/error indicator.
         """
         filename = secure_filename(filename)
-        if not filename.lower().endswith('.pdf'):
-            return {'message': 'Only PDF files can be archived.', 'error': True}
 
-        file_path = os.path.join(self.upload_folder, filename)
-        new_path = os.path.join(self.archive_folder, filename)
+        is_valid, error_message = self.validate_file_for_operation(filename, 'archive')
+        if not is_valid:
+            return {'message': error_message, 'error': True}
+
+        current_path = self.get_file_path(filename, "upload")
+        new_path = self.get_file_path(filename, "archive")
 
         if os.path.isfile(new_path):
             return {'message': f"File {filename} already exists in the archive.", 'error': True}
 
-        if os.path.isfile(file_path):
+        if os.path.isfile(current_path):
             try:
-                shutil.move(file_path, new_path)
+                shutil.move(current_path, new_path)
                 self.write_archive_date(new_path, datetime.now())
                 logging.info(f"File {filename} archived successfully.")
                 return {'message': f'File {filename} archived successfully!', 'success': True}
@@ -163,15 +213,15 @@ class FileManager:
         if not filename.lower().endswith('.pdf'):
             return {'message': 'Only PDF files can be restored.', 'error': True}
 
-        file_path = os.path.join(self.archive_folder, filename)
-        new_path = os.path.join(self.upload_folder, filename)
+        current_path = self.get_file_path(filename, 'archive')
+        new_path = self.get_file_path(filename, 'upload')
 
         if os.path.isfile(new_path):
             return {'message': f"File {filename} already exists in the upload folder.", 'error': True}
 
-        if os.path.isfile(file_path):
+        if os.path.isfile(current_path):
             try:
-                shutil.move(file_path, new_path)
+                shutil.move(current_path, new_path)
                 logging.info(f"File {filename} restored successfully.")
                 return {'message': f'File {filename} restored successfully!', 'success': True}
             except (IOError, OSError) as e:
