@@ -1,0 +1,55 @@
+.upload-icon:hover,
+.profile-icon:hover,
+.logout-icon:hover,
+.login-icon:hover,
+.register-icon:hover {
+    background-color: #007bff;
+}
+
+.upload-icon i,
+.profile-icon i,
+.logout-icon i,
+.login-icon i,
+.register-icon i {
+    font-size: 37px;
+    color: black;
+}
+
+.upload-icon,
+.profile-icon,
+.logout-icon,
+.login-icon,
+.register-icon {
+    margin-left: auto;
+    padding: 10px;
+}
+
+.home-icon,
+.profile-icon,
+.logout-icon,
+.login-icon,
+.register-icon {
+    cursor: pointer;
+    margin-left: 10px;
+    display: flex;
+    align-items: center;
+    padding: 10px;
+}
+
+.home-icon:hover,
+.profile-icon:hover,
+.logout-icon:hover,
+.login-icon:hover,
+.register-icon:hover {
+    background-color: #007bff;
+}
+
+.home-icon i,
+.profile-icon i,
+.logout-icon i,
+.login-icon i,
+.register-icon i {
+    font-size: 37px;
+    color: black;
+    margin-right: 5px;
+}

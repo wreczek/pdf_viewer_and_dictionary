@@ -5,6 +5,11 @@
 Dictionary
 {% endblock %}
 
+{% block additional_styles %}
+<link href="{{ url_for('static', filename='css/tables.css') }}" rel="stylesheet">
+<link href="{{ url_for('static', filename='css/base.css') }}" rel="stylesheet">
+{% endblock %}
+
 {% block content %}
 <script src="{{ url_for('static', filename='js/fetch_content.js') }}"></script>
 <script src="{{ url_for('static', filename='js/word_details.js') }}"></script>

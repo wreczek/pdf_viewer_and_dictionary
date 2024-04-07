@@ -1,0 +1,33 @@
+.my-table {
+    border-collapse: collapse;
+    width: 100%;
+}
+
+.my-table th,
+.my-table td {
+    text-align: left;
+    padding: 8px;
+}
+
+.my-table th {
+    background-color: #f2f2f2;
+    color: black;
+}
+
+.my-table tr:nth-child(even) {
+    background-color: #8cc5a8;
+}
+
+.my-table tr:nth-child(odd) {
+    background-color: #D6EEEE;
+}
+
+.my-table caption {
+    font-size: 1.2em;
+    font-weight: bold;
+    padding: 10px;
+    background-color: #f2f2f2;
+    border: 1px solid #ddd;
+    border-bottom: none;
+    text-align: center;
+}

@@ -4,6 +4,10 @@
 Files list
 {% endblock %}
 
+{% block additional_styles %}
+<link href="{{ url_for('static', filename='css/tables.css') }}" rel="stylesheet">
+{% endblock %}
+
 {% block content %}
 <script src="{{ url_for('static', filename='js/checkbox_clearing.js') }}"></script>
 <script src="{{ url_for('static', filename='js/batch_operations.js') }}"></script>

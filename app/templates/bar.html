@@ -5,7 +5,10 @@
 <title>{% block title %}{% endblock %}</title>
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css"
     crossorigin="anonymous" />
-<link rel="stylesheet" href="{{ url_for('static', filename='css/styles.css') }}">
+
+<link rel="stylesheet" href="{{ url_for('static', filename='css/base.css') }}">
+<link rel="stylesheet" href="{{ url_for('static', filename='css/navbar.css') }}">
+<link rel="stylesheet" href="{{ url_for('static', filename='css/icons.css') }}">
 
 <!-- jQuery -->
 <script src="https://code.jquery.com/jquery-3.7.1.min.js" integrity="sha384-1H217gwSVyLSIfaLxHbE7dRb3v4mYCKbpQvzx0cegeju1MVsGrX5xXxAvs/HgeFs" crossorigin="anonymous"></script>
@@ -77,6 +80,7 @@
     </div>
     {% endif %}
 {% endwith %}
+{% block additional_styles %}{% endblock %}
 {% block content %}{% endblock %}
 </body>
 </html>

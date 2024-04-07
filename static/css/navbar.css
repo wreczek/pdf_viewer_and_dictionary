@@ -1,0 +1,30 @@
+.nav-bar {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    background-color: #28a745;
+    padding: 10px;
+    text-align: center;
+}
+
+.nav-bar a {
+    display: inline-block;
+    text-decoration: none;
+    color: black;
+    font-size: 18px;
+    margin-right: 10px;
+    padding: 10px 20px;
+    background-color: #e9ecef;
+    border: none;
+    border-radius: 4px;
+    transition: background-color 0.2s ease-in-out;
+}
+
+.nav-bar a:hover {
+    background-color: #007bff;
+    color: white;
+}
+
+.nav-bar a.active {
+    border: 3px solid red;
+}
