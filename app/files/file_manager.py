@@ -8,7 +8,7 @@ import send2trash
 from werkzeug.utils import secure_filename
 from win32_setctime import setctime
 
-from utils import config, get_status
+from utils import config
 
 ALLOWED_EXTENSIONS = {'txt', 'pdf'}
 
@@ -16,242 +16,137 @@ logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(name)s - %(level
 
 
 class FileManager:
-    def __init__(self, upload_folder, archive_folder):
+    def __init__(self, upload_folder, archive_folder, max_file_size=config.max_size):
+        self.uploader = FileUploader(upload_folder, max_file_size)
+        self.lister = FileLister(upload_folder, archive_folder)
+        self.deleter = FileDeleter(upload_folder, archive_folder)
+        self.archiver = FileArchiver(upload_folder, archive_folder)
+
+    # Facade methods for backward compatibility or simplified access
+    def upload_files(self, files):
+        return self.uploader.upload_files(files)
+
+    def list_uploaded_files(self):
+        return self.lister.list_files('upload')
+
+    def list_archived_files(self):
+        return self.lister.list_files('archive')
+
+    def delete_file(self, filename, permanent=False):
+        return self.deleter.delete_file(filename, permanent)
+
+    def archive_file(self, filename):
+        return self.archiver.archive_file(filename)
+
+    def restore_file(self, filename):
+        return self.archiver.restore_file(filename)
+
+
+class FileUploader:
+    def __init__(self, upload_folder, max_file_size):
         self.upload_folder = upload_folder
-        self.archive_folder = archive_folder
-        self.not_found_msg = 'File not found or is a directory.'
-
-    def get_file_path(self, filename: str, folder_type: str) -> str:
-        """
-        Constructs a file path based on the filename and folder type.
-
-        Args:
-            filename (str): The name of the file.
-            folder_type (str): The type of folder ('upload' or 'archive') to construct the path for.
-
-        Returns:
-            str: The constructed file path.
-        """
-        base_path = self.upload_folder if folder_type == 'upload' else self.archive_folder
-        secure_name = secure_filename(filename)
-        final_path = os.path.join(base_path, secure_name)
-        # Ensure the final path is within the intended directory
-        if os.path.commonpath([final_path, base_path]) != os.path.normpath(base_path):
-            raise ValueError("Invalid file path. Potential directory traversal attempt detected.")
-        return final_path
-
-    @staticmethod
-    def validate_file_for_operation(filename: str, operation: str) -> (bool, str):
-        """
-        Validates the file for the specified operation.
-
-        Args:
-            filename (str): The name of the file to validate.
-            operation (str): The operation to validate against. Valid operations are 'upload', 'delete', 'archive', and 'restore'.
-
-        Returns:
-            (bool, str): A tuple where the first element is a boolean indicating if the file is valid for the operation, and the second element is an error message in case of validation failure.
-        """
-        # Check for allowed file type
-        if '.' not in filename or filename.rsplit('.', 1)[1].lower() not in ALLOWED_EXTENSIONS:
-            return False, f"File type of {filename} is not allowed."
-
-        # Operation-specific validations
-        if operation in ['delete', 'archive', 'restore'] and not filename.lower().endswith('.pdf'):
-            return False, "Only PDF files can be processed for this operation."
-
-        return True, ""
+        self.max_file_size = max_file_size
 
     def upload_files(self, files):
-        """Uploads multiple files to the designated upload folder."""
         uploaded_files = []
         for file in files:
             if file.filename == '':
                 continue
             filename = secure_filename(file.filename)
 
-            # Use the new validation method
-            is_valid, error_message = self.validate_file_for_operation(file.filename, 'upload')
-            if not is_valid:
-                return {'message': error_message, 'error': True}
+            if not self.allowed_file(filename):
+                return {'message': f"File type of {filename} is not allowed.", 'error': True}
 
-            # Size check remains here as it's specific to uploads
-            if file.content_length > config.max_size:
-                size = file.content_length
-                return {
-                    'message': f'File size of {file.filename} exceeds the maximum limit of {self.format_file_size(size)}.',
-                    'error': True}
+            if file.content_length > self.max_file_size:
+                return {'message': f"File size of {filename} exceeds the maximum limit.", 'error': True}
 
-            try:
-                file_path = self.get_file_path(filename, "upload")
-                file.save(file_path)
-                self.update_file_creation_date(file_path)
-                uploaded_files.append(filename)
-                logging.info(f'File {filename} uploaded successfully.')
-            except Exception as e:
-                logging.error(f'Error uploading file {filename}: {e}')
-                return {'message': f"Error uploading file {filename}: {e}", 'error': True}
+            file_path = os.path.join(self.upload_folder, filename)
+            file.save(file_path)
+            uploaded_files.append(filename)
+
         if uploaded_files:
             return {'message': f"Files successfully uploaded: {', '.join(uploaded_files)}", 'success': True}
         else:
-            return {'message': 'No files were uploaded.', 'error': True}
+            return {'message': "No files were uploaded.", 'error': True}
 
     @staticmethod
     def update_file_creation_date(file_path):
         current_time = datetime.now().timestamp()
         setctime(file_path, current_time)
 
-    def list_uploaded_files(self):
-        """Retrieves information about available files in the upload folder."""
-        files_info = self.list_files(path=self.upload_folder)
-        files_info.sort(key=lambda x: x['access_date'], reverse=True)
-        return files_info
+    @staticmethod
+    def allowed_file(filename):
+        return '.' in filename and filename.rsplit('.', 1)[1].lower() in ALLOWED_EXTENSIONS
 
-    def list_archived_files(self):
-        files_info = self.list_files(path=self.archive_folder)
-        files_info.sort(key=lambda x: x['archive_date'], reverse=True)
-        return files_info
 
-    def list_files(self, path):
-        files_info = []
-        for filename in self.get_available_files(path):
-            file_path = os.path.join(path, filename)
-            status = get_status(file_path)
-            upload_date = self.get_upload_date(file_path)
-            access_date = self.get_access_date(file_path)
-            archive_date = self.get_archive_date(file_path)
+class FileLister:
+    def __init__(self, upload_folder, archive_folder):
+        self.upload_folder = upload_folder
+        self.archive_folder = archive_folder
 
-            files_info.append({
-                'name': filename,
-                'upload_date': upload_date,
-                'access_date': access_date,
-                'archive_date': archive_date,
-                'status': status
-            })
-
-        return files_info
-
-    def delete_file(self, filename):
-        """Deletes a file from the upload folder after ensuring it is a PDF and not a directory."""
-        filename = secure_filename(filename)
-        is_valid, error_message = self.validate_file_for_operation(filename, 'delete')
-        if not is_valid:
-            return {'message': error_message, 'error': True}
-
-        file_path = self.get_file_path(filename, 'upload')
-        if os.path.isfile(file_path):
-            try:
-                send2trash.send2trash(file_path)
-                logging.info(f'File {filename} deleted successfully.')
-                return {'message': f'File {filename} deleted successfully!', 'success': True}
-            except Exception as e:
-                logging.error(f'Error deleting file {filename}: {e}')
-                return {'message': f"Error deleting file: {e}", 'error': True}
-        else:
-            logging.warning(f'File not found: {filename}')
-            return {'message': self.not_found_msg, 'error': True}
-
-    def permanently_delete_file(self, filename):
-        """todo"""
-        filename = secure_filename(filename)
-
-        is_valid, error_message = self.validate_file_for_operation(filename, 'archive')
-        if not is_valid:
-            return {'message': error_message, 'error': True}
-
-        file_path = self.get_file_path(filename, 'archive')
-
-        if os.path.isfile(file_path):
-            try:
-                os.remove(file_path)
-                logging.info(f'File {filename} permanently deleted successfully.')
-                return {'message': f'File {filename} deleted successfully!', 'success': True}
-            except Exception as e:
-                logging.error(f'Error permanently deleting file {filename}: {e}')
-                return {'message': f"Error deleting file: {e}", 'error': True}
-        else:
-            return {'message': self.not_found_msg, 'error': True}
-
-    def archive_file(self, filename):
+    def list_files(self, folder_type, extension=None):
         """
-        Archives a PDF file by moving it from the upload folder to the archive folder.
+        Lists files in the specified folder, optionally filtering by extension.
 
         Args:
-            filename (str): The name of the file to be archived.
+            folder_type (str): 'upload' or 'archive' to specify the folder.
+            extension (str, optional): Filter files by this extension. Include the dot, e.g., '.pdf'.
+
         Returns:
-            dict: A dictionary containing the status message and success/error indicator.
+            list[dict]: List of dictionaries with file information.
         """
-        filename = secure_filename(filename)
-
-        is_valid, error_message = self.validate_file_for_operation(filename, 'archive')
-        if not is_valid:
-            return {'message': error_message, 'error': True}
-
-        current_path = self.get_file_path(filename, "upload")
-        new_path = self.get_file_path(filename, "archive")
-
-        if os.path.isfile(new_path):
-            return {'message': f"File {filename} already exists in the archive.", 'error': True}
-
-        if os.path.isfile(current_path):
-            try:
-                shutil.move(current_path, new_path)
-                self.write_archive_date(new_path, datetime.now())
-                logging.info(f"File {filename} archived successfully.")
-                return {'message': f'File {filename} archived successfully!', 'success': True}
-            except (IOError, OSError) as e:
-                logging.error(f"Error archiving file {filename}: {e}")
-                return {'message': f"Error archiving file: {e}", 'error': True}
-        else:
-            logging.warning(f"File not found: {filename}")
-            return {'message': self.not_found_msg, 'error': True}
-
-    def restore_file(self, filename):
-        """Restores a PDF file by moving it from the archive folder back to the upload folder.
-        Returns a dictionary with the operation result."""
-        filename = secure_filename(filename)
-        if not filename.lower().endswith('.pdf'):
-            return {'message': 'Only PDF files can be restored.', 'error': True}
-
-        current_path = self.get_file_path(filename, 'archive')
-        new_path = self.get_file_path(filename, 'upload')
-
-        if os.path.isfile(new_path):
-            return {'message': f"File {filename} already exists in the upload folder.", 'error': True}
-
-        if os.path.isfile(current_path):
-            try:
-                shutil.move(current_path, new_path)
-                logging.info(f"File {filename} restored successfully.")
-                return {'message': f'File {filename} restored successfully!', 'success': True}
-            except (IOError, OSError) as e:
-                logging.error(f"Error restoring file {filename}: {e}")
-                return {'message': f"Error restoring file: {e}", 'error': True}
-        else:
-            return {'message': self.not_found_msg, 'error': True}
+        path = self.upload_folder if folder_type == 'upload' else self.archive_folder
+        return [self.get_file_info(os.path.join(path, filename)) for filename in
+                self.get_available_files(path, extension)]
 
     @staticmethod
-    def format_file_size(size_bytes):
-        """Formats the file size in a human-readable format using f-strings and a dictionary."""
-        suffixes = ["bytes", "KiB", "MiB", "GiB"]
-        index = 0
+    def get_available_files(path, extension=None):
+        """
+        Get available files in the specified path, optionally filtered by an extension.
 
-        while size_bytes >= 1024 and index < len(suffixes) - 1:
-            size_bytes /= 1024
-            index += 1
+        Args:
+            path (str): Path to the directory to list files from.
+            extension (str, optional): File extension to filter by.
 
-        return f"{size_bytes:.1f} {suffixes[index]}"
+        Returns:
+            list[str]: List of filenames.
+        """
+        files = os.listdir(path)
+        if extension:
+            return [f for f in files if f.endswith(extension)]
+        return files
 
     @staticmethod
-    def get_available_files(path):
-        pdf_files = [f for f in os.listdir(path) if f.endswith('.pdf')]
+    def get_file_info(file_path):
+        """
+        Retrieves basic information about a file.
 
-        return pdf_files
+        Args:
+            file_path (str): Path to the file.
+
+        Returns:
+            dict: Dictionary containing the file's name and upload date.
+        """
+        try:
+            creation_time = os.path.getctime(file_path)
+            upload_date = datetime.fromtimestamp(creation_time).strftime("%Y-%m-%d %H:%M:%S")
+        except Exception as e:
+            logging.error(f"Error getting information for file {file_path}: {e}")
+            upload_date = "Unknown"
+        return {
+            'name': os.path.basename(file_path),
+            'path': file_path,
+            'upload_date': upload_date
+        }
 
     @staticmethod
-    def allowed_file(filename: str):
-        return '.' in filename and \
-            filename.rsplit('.', 1)[1].lower() in ALLOWED_EXTENSIONS
+    def get_upload_date(file_path):
+        try:
+            creation_time = os.path.getctime(file_path)
+            return datetime.fromtimestamp(creation_time).strftime("%Y-%m-%d %H:%M:%S")
+        except Exception as e:
+            logging.error(f"Error getting upload date for {file_path}: {e}")
+            return "Unknown"
 
     @staticmethod
     def get_access_date(file_path):
@@ -261,16 +156,6 @@ class FileManager:
             return access_date
         except Exception as e:
             print(f"Error getting access date: {e}")
-            return None
-
-    @staticmethod
-    def get_upload_date(file_path):
-        try:
-            creation_time = os.path.getctime(file_path)
-            upload_date = datetime.fromtimestamp(creation_time).strftime("%Y-%m-%d %H:%M:%S")
-            return upload_date
-        except Exception as e:
-            print(f"Error getting upload date: {e}")
             return None
 
     @staticmethod
@@ -291,39 +176,44 @@ class FileManager:
 
         return date
 
-    @staticmethod
-    def write_archive_date(file_path, archive_date):
-        metadata_file = config.metadata_file
-        # Ensure the directory exists
-        directory = os.path.dirname(metadata_file)
-        if not os.path.exists(directory):
-            try:
-                os.makedirs(directory)
-            except Exception as e:
-                return {'message': f'Failed to create directory: {e}', 'error': True}
 
-        # Attempt to read existing data
-        if os.path.exists(metadata_file):
-            try:
-                with open(metadata_file) as f:
-                    data = json.load(f)
-            except Exception as e:
-                return {'message': f'Failed to read metadata file: {e}', 'error': True}
+class FileDeleter:
+    def __init__(self, upload_folder, archive_folder):
+        self.upload_folder = upload_folder
+        self.archive_folder = archive_folder
+
+    def delete_file(self, filename, permanent=False):
+        folder = self.archive_folder if permanent else self.upload_folder
+        file_path = os.path.join(folder, secure_filename(filename))
+        if not os.path.exists(file_path):
+            return {'message': "File not found.", 'error': True}
+
+        if permanent:
+            os.remove(file_path)
         else:
-            data = {}
+            send2trash.send2trash(file_path)
 
-        # Convert datetime to string in ISO format
-        if isinstance(archive_date, datetime):
-            archive_date = archive_date.isoformat()
+        return {'message': f"File {filename} {'permanently ' if permanent else ''}deleted successfully.",
+                'success': True}
 
-        # Update the data
-        data[file_path] = archive_date
 
-        # Attempt to write the data back
-        try:
-            with open(metadata_file, "w") as f:
-                json.dump(data, f, indent=4)
-        except Exception as e:
-            return {'message': f'Failed to write metadata file: {e}', 'error': True}
+class FileArchiver:
+    def __init__(self, upload_folder, archive_folder):
+        self.upload_folder = upload_folder
+        self.archive_folder = archive_folder
 
-        return {'message': 'Archive date updated successfully.', 'error': False}
+    def archive_file(self, filename):
+        source = os.path.join(self.upload_folder, secure_filename(filename))
+        destination = os.path.join(self.archive_folder, secure_filename(filename))
+        if not os.path.exists(source):
+            return {'message': "File not found.", 'error': True}
+        shutil.move(source, destination)
+        return {'message': f"File {filename} archived successfully.", 'success': True}
+
+    def restore_file(self, filename):
+        source = os.path.join(self.archive_folder, secure_filename(filename))
+        destination = os.path.join(self.upload_folder, secure_filename(filename))
+        if not os.path.exists(source):
+            return {'message': "File not found in archive.", 'error': True}
+        shutil.move(source, destination)
+        return {'message': f"File {filename} restored successfully.", 'success': True}

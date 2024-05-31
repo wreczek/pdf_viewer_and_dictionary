@@ -21,3 +21,6 @@ if __name__ == "__main__":
 #   4. Dodac Word model, ORM i usuwanie dodawanie etc. przez ten model
 #   5. Add list_words endpoint with pagination
 #   6. posprzatac nazewnictwo endpointow i sciezek (uploaded_list, pdf_viewer, ... etc)
+#   otworzyc file_manager.py vs temp_file_manager.py i przepisac stare rzeczy do nowego podejscia
+#   7. uploadowanie plikow: aktualnie upload pliku z ta sama nazwa zamienia pliki + nie zmienia daty uploadu
+#   8. zapisywanie stanu PDFa na host=0.0.0.0 dla wszystkich ten sam (nawet chyba jesli ktos mial usera)

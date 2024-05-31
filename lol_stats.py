@@ -12,28 +12,46 @@ import seaborn as sns
 from tabulate import tabulate
 
 # Replace 'YOUR_API_KEY' with your actual API key
-API_KEY = 'RGAPI-a49c3d87-5231-4fb0-8554-bf0293d94169'
+# API_KEY = 'RGAPI-899a4d72-7c10-4085-8a98-8cfb624744d2'
+API_KEY = 'RGAPI-010023e0-531b-4083-88d7-e23aac5e2087'
 
 # Replace 'SUMMONER_NAME' with your summoner name, and ensure you're using the correct region
 SUMMONER_NAME = 'Lunesco'
+TAG_LINE = 'EUNE'
 
-COUNT = 47
+TAG_LINES = {
+    'ja': 'EUNE',
+    'lysy': '59411%20'  # %20
+}
+
+COUNT = 8
+SOLO_QUEUE_ID = 420
+FLEX_QUEUE_ID = 440
+
+QUEUE_ID = SOLO_QUEUE_ID
 
 
-def get_puuid_url(nickname, api_key):
-    return f'https://eun1.api.riotgames.com/lol/summoner/v4/summoners/by-name/{nickname}?api_key={api_key}'
+def get_puuid_url_new(nickname, tag_line, api_key):
+    url = f'https://europe.api.riotgames.com/riot/account/v1/accounts/by-riot-id/{nickname}/{tag_line}?api_key={api_key}'
+    print(url)
+    return url
 
 
-def get_matches_url(puuid, count, api_key):
-    return f'https://europe.api.riotgames.com/lol/match/v5/matches/by-puuid/{puuid}/ids?start=0&count={count}&api_key={api_key}'
+def get_matches_url(puuid, count, api_key):  # TODO: add args: type, queue
+    url = f'https://europe.api.riotgames.com/lol/match/v5/matches/by-puuid/{puuid}/ids?start=0&count={count}&api_key={api_key}&type=ranked&queue={QUEUE_ID}'
+    print(url)
+    return url
 
 
 def get_match_data_url(match_id, api_key):
-    return f'https://europe.api.riotgames.com/lol/match/v5/matches/{match_id}?api_key={api_key}'
+    url = f'https://europe.api.riotgames.com/lol/match/v5/matches/{match_id}?api_key={api_key}'
+    print(url)
+    return url
 
 
-def get_user_puuid(nickname, api_key):
-    puuid_request_url = get_puuid_url(nickname, api_key)
+def get_user_puuid(nickname, tag_line, api_key):
+    # puuid_request_url = get_puuid_url(nickname, api_key)
+    puuid_request_url = get_puuid_url_new(nickname, tag_line=TAG_LINE, api_key=api_key)
     resp = requests.get(puuid_request_url)
     if resp.status_code == 200:
         return resp.json()['puuid']
@@ -65,41 +83,72 @@ def fetch_match_details(match_id, api_key):
 def find_player_data_by_name(match_info, summoner_name):
     for player in match_info['info']['participants']:
         if player.get('riotIdGameName') == summoner_name:
+            print(f'{player=}')
             return player
     return None
 
 
+table = None
+# List of teammates' nicknames
+team_nicknames = {"Lunesco", "badgar", "Gralfindel", "Derrezed", "GTraxX"}
+
 # Main workflow starts here
-puuid = get_user_puuid(SUMMONER_NAME, API_KEY)
+puuid = get_user_puuid(SUMMONER_NAME, TAG_LINE, API_KEY)
+match_ids = []
+
 if puuid:
     match_ids = get_user_matches_ids(puuid, COUNT, API_KEY)  # Fetching details for the latest 20 matches
     data = []
 
-    for match_id in match_ids:
-        match_details = fetch_match_details(match_id, API_KEY)
-        if match_details:
-            my_dict = find_player_data_by_name(match_details, SUMMONER_NAME)
-            my_team_id = my_dict['teamId']
-            # Extract necessary match details here and append to data list
-            for participant in match_details['info']['participants']:
-                role = participant['lane']
-                team = 'YOUR TEAM' if participant['teamId'] == my_team_id else 'ENEMY TEAM'
-                kda = f"{participant['kills']}/{participant['deaths']}/{participant['assists']}"
-                dmg = participant['totalDamageDealtToChampions']
-                gold = participant['goldEarned']
-                data.append([team, role, kda, dmg, gold])
+print(f'{puuid=}')
 
-    df = pd.DataFrame(data, columns=['Team', 'Role', 'KDA', 'DMG', 'GOLD'])
+# Initialize counters
+total_kills = 0
+total_deaths = 0
+total_assists = 0
+matches_analyzed = 0
 
-    # Adjusting Role names to match expected format (e.g., converting MID to MIDDLE)
-    # This can be expanded based on the data and how Riot API returns lane information
-    df['Role'] = df['Role'].replace({'MID': 'MIDDLE', 'BOT': 'BOTTOM'})
+for match_id in match_ids:
+    players = set()
+    match_details = fetch_match_details(match_id, API_KEY)
+    if match_details:
+        if match_details['info']['gameDuration'] < 900 or match_details['info']['queueId'] != QUEUE_ID:
+            continue
+        if match_details is None:
+            break
+        my_dict = find_player_data_by_name(match_details, SUMMONER_NAME)
+        if my_dict is None:
+            continue
+        my_team_id = my_dict['teamId']
+        participant_nicknames = {participant['riotIdGameName'] for participant in
+                                 match_details['info']['participants']}
+        # if not team_nicknames.issubset(participant_nicknames):
+        #     continue
 
-    # Create the pivot table
-    table = df.pivot_table(index='Team', columns='Role', values=['KDA', 'DMG', 'GOLD'],
-                           aggfunc=lambda x: ' / '.join(x.astype(str)))
+        for participant in match_details['info']['participants']:
+            # lane = participant['lane']
+            role = participant['individualPosition']
+            team = 'YOUR TEAM' if participant['teamId'] == my_team_id else 'ENEMY TEAM'
+            kills = participant['kills']
+            deaths = participant['deaths']
+            assists = participant['assists']
+            kda = round(participant['challenges']['kda'], 2)
+            dmg = participant['totalDamageDealtToChampions']
+            gold = participant['goldEarned']
+            turret_dmg = participant['damageDealtToTurrets']
+            data.append([team, role, kda, dmg, gold, turret_dmg])
 
-    print(table)
+df = pd.DataFrame(data, columns=['Team', 'Role', 'KDA', 'DMG', 'GOLD', 'TURRET_DMG'])
+
+# Adjusting Role names to match expected format
+# This can be expanded based on the data and how Riot API returns lane information
+df['Role'] = df['Role'].replace({'MIDDLE': 'MID', 'UTILITY': 'SUPP', 'BOTTOM': 'ADC'})
+
+# Create the pivot table
+table = df.pivot_table(index='Team', columns='Role', values=['KDA', 'DMG', 'GOLD', 'TURRET_DMG'],
+                       aggfunc=lambda x: ' / '.join(x.astype(str)))
+
+print(table)
 
 # After your DataFrame 'table' is created
 print(tabulate(table, headers='keys', tablefmt='grid'))
@@ -108,7 +157,7 @@ print(tabulate(table, headers='keys', tablefmt='grid'))
 sns.set_theme(style="whitegrid")
 
 # Assuming 'df' is your DataFrame before pivoting
-for stat in ['KDA', 'DMG', 'GOLD']:
+for stat in ['KDA', 'DMG', 'GOLD', 'TURRET_DMG']:
     plt.figure(figsize=(10, 6))
     sns.barplot(data=df, x='Role', y=stat, hue='Team')
     plt.title(f'Team Comparison by {stat}')
