@@ -24,3 +24,7 @@ if __name__ == "__main__":
 #   otworzyc file_manager.py vs temp_file_manager.py i przepisac stare rzeczy do nowego podejscia
 #   7. uploadowanie plikow: aktualnie upload pliku z ta sama nazwa zamienia pliki + nie zmienia daty uploadu
 #   8. zapisywanie stanu PDFa na host=0.0.0.0 dla wszystkich ten sam (nawet chyba jesli ktos mial usera)
+#   9. dodac jakies pipeliny/CI/CD:
+#       a) docker-compose.yml
+#       b) testy
+#       c) githyb.yml?
