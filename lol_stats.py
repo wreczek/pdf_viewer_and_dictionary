@@ -13,7 +13,7 @@ from tabulate import tabulate
 
 # Replace 'YOUR_API_KEY' with your actual API key
 # API_KEY = 'RGAPI-899a4d72-7c10-4085-8a98-8cfb624744d2'
-API_KEY = 'RGAPI-010023e0-531b-4083-88d7-e23aac5e2087'
+API_KEY = None
 
 # Replace 'SUMMONER_NAME' with your summoner name, and ensure you're using the correct region
 SUMMONER_NAME = 'Lunesco'
